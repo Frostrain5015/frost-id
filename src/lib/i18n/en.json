@@ -23,7 +23,7 @@
     "page_title": "Sign In — Frost ID",
     "context_oauth": "Sign in to continue to your application",
     "context_admin": "Access the administration console",
-    "email": "Email address",
+    "identifier": "Email or username",
     "password": "Password",
     "submit": "Sign In",
     "submitting": "Signing in",

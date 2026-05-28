@@ -2,7 +2,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { db } from '$lib/server/db/client.js';
 import { users } from '$lib/server/db/schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
 import { createSession } from '$lib/server/session.js';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -18,18 +18,23 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const data = await request.formData();
-		const email = (data.get('email') as string)?.trim().toLowerCase();
+		const identifier = (data.get('identifier') as string)?.trim();
 		const password = data.get('password') as string;
 		const oauthParams = data.get('oauth_params') as string | null;
 
-		if (!email || !password) {
+		if (!identifier || !password) {
 			return fail(400, { errorKey: 'login.err_required' });
 		}
 
+		// Match by email first, fall back to name (username for migrated accounts)
+		const identifierLower = identifier.toLowerCase();
 		const [user] = await db
 			.select()
 			.from(users)
-			.where(eq(users.email, email))
+			.where(or(
+				eq(users.email, identifierLower),
+				eq(users.name, identifier)
+			))
 			.limit(1);
 
 		if (!user || !(await bcrypt.compare(password, user.passwordHash))) {

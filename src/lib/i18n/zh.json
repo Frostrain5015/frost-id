@@ -23,7 +23,7 @@
     "page_title": "登录 — Frost ID",
     "context_oauth": "登录以继续访问您的应用",
     "context_admin": "访问管理控制台",
-    "email": "电子邮箱",
+    "identifier": "邮箱或用户名",
     "password": "密码",
     "submit": "登 录",
     "submitting": "正在登录",

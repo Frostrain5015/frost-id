@@ -22,10 +22,27 @@
 			errorMsg = form.errorKey;
 			errorShake = true;
 			setTimeout(() => (errorShake = false), 550);
-		} else {
+		} else if (!form) {
 			errorMsg = '';
 		}
 	});
+
+	function handleEnhance() {
+		// Client-side validation — prevents server round-trip for empty fields
+		const identifierEl = document.getElementById('identifier') as HTMLInputElement;
+		const passwordEl = document.getElementById('password') as HTMLInputElement;
+		if (!identifierEl.value.trim() || !passwordEl.value) {
+			errorMsg = 'login.err_required';
+			errorShake = true;
+			setTimeout(() => (errorShake = false), 550);
+			return;
+		}
+		loading = true;
+		return async ({ update }: { update: (opts?: { reset?: boolean }) => Promise<void> }) => {
+			await update({ reset: false });
+			loading = false;
+		};
+	}
 </script>
 
 <svelte:head>
@@ -48,24 +65,17 @@
 				</div>
 			{/if}
 
-			<form
-				method="POST"
-				use:enhance={() => {
-					loading = true;
-					return async ({ update }) => {
-						await update({ reset: false });
-						loading = false;
-					};
-				}}
-			>
+			<form method="POST" novalidate use:enhance={handleEnhance}>
 				<input type="hidden" name="oauth_params" value={data.oauthParams ?? ''} />
 
 				<div class="field">
-					<label for="email">{$t('login.email')}</label>
+					<label for="identifier">{$t('login.identifier')}</label>
 					<input
-						type="email" id="email" name="email"
-						placeholder={$t('login.email')}
-						autocomplete="email" required
+						type="text"
+						id="identifier"
+						name="identifier"
+						placeholder={$t('login.identifier')}
+						autocomplete="username"
 						disabled={loading}
 						onfocus={() => (errorMsg = '')}
 					/>
@@ -74,9 +84,11 @@
 				<div class="field" style="margin-bottom: 0">
 					<label for="password">{$t('login.password')}</label>
 					<input
-						type="password" id="password" name="password"
+						type="password"
+						id="password"
+						name="password"
 						placeholder={$t('login.password')}
-						autocomplete="current-password" required
+						autocomplete="current-password"
 						disabled={loading}
 						onfocus={() => (errorMsg = '')}
 					/>
@@ -102,9 +114,7 @@
 
 			<p class="switch-link">
 				{$t('login.register_prompt')}
-				<a
-					href={data.oauthParams ? `/register?oauth=${encodeURIComponent(data.oauthParams)}` : '/register'}
-				>
+				<a href={data.oauthParams ? `/register?oauth=${encodeURIComponent(data.oauthParams)}` : '/register'}>
 					{$t('login.register_link')}
 				</a>
 			</p>
