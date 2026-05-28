@@ -41,22 +41,34 @@
 	<main class="wrap" class:mounted>
 		<div class="card">
 
-			<!-- Brand wordmark (compact) -->
-			<header class="brand">
-				<div class="brand-row">
+			<!-- Dual-brand header: Frost ID ⟷ Application -->
+			<div class="dual-brand">
+				<div class="brand-block">
 					<span class="brand-icon brand-mark" aria-hidden="true">❄</span>
-					<h1 class="wordmark"><span class="frost">Frost</span>&thinsp;<strong>ID</strong></h1>
+					<h2 class="brand-name"><span class="frost">Frost</span>&thinsp;<strong>ID</strong></h2>
 				</div>
-				<p class="brand-sub">{$t('common.auth_server')}</p>
-			</header>
+
+				<div class="connector" aria-hidden="true">
+					<div class="connector-line"></div>
+					<div class="connector-icon">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M4 12h16" /><path d="M14 6l6 6-6 6" />
+						</svg>
+					</div>
+					<div class="connector-line"></div>
+				</div>
+
+				<div class="brand-block brand-block--app">
+					<div class="app-icon" aria-hidden="true">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M3 3l18 18" /><path d="M21 3L3 21" />
+						</svg>
+					</div>
+					<h2 class="brand-name brand-name--app">{data.clientName}</h2>
+				</div>
+			</div>
 
 			<div class="divider" aria-hidden="true"></div>
-
-			<!-- Heading -->
-			<h2 class="heading">
-				{$t('consent.heading1')}<br />
-				<em>{$t('consent.heading2')}</em>
-			</h2>
 
 			<!-- Signed-in user -->
 			<p class="signed-as">
@@ -67,14 +79,8 @@
 				<div class="err" role="alert" aria-live="assertive">{$t(form.errorKey)}</div>
 			{/if}
 
-			<!-- Application cert -->
-			<div class="cert">
-				<p class="cert-label">{$t('consent.cert_eyebrow')}</p>
-				<p class="cert-name">{data.clientName}</p>
-				<p class="cert-want">{$t('consent.cert_want')}</p>
-			</div>
-
 			<!-- Scopes -->
+			<p class="scopes-label">{$t('consent.cert_want')}</p>
 			<ul class="scopes" aria-label={$t('consent.cert_want')}>
 				{#each data.scopes as scope, i}
 					{@const meta = scopeInfo(scope)}
@@ -151,31 +157,30 @@
 	.wrap.mounted { opacity: 1; transform: translateY(0); }
 	.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.75rem 2.5rem 2rem; }
 
-	/* Brand */
-	.brand { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; margin-bottom: 1.25rem; }
-	.brand-row { display: flex; align-items: center; gap: 0.625rem; }
-	.brand-icon { font-size: 2rem; }
-	.wordmark { font-family: var(--font-display); font-size: 1.75rem; font-weight: 200; letter-spacing: 0.08em; color: var(--text); line-height: 1; }
-	.wordmark strong { font-weight: 500; }
-	.frost { color: var(--accent); }
-	.brand-sub { font-family: var(--font-body); font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); opacity: 0.6; }
+	/* Dual-brand */
+	.dual-brand { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+	.brand-block { display: flex; flex-direction: column; align-items: center; gap: 0.375rem; min-width: 0; }
+	.brand-block--app { opacity: 0.7; }
+	.brand-icon { font-size: 2.25rem; line-height: 1; }
+	.brand-name { font-family: var(--font-display); font-size: 1rem; font-weight: 200; letter-spacing: 0.06em; color: var(--text); line-height: 1; white-space: nowrap; }
+	.brand-name strong { font-weight: 500; }
+	.brand-name .frost { color: var(--accent); }
+	.brand-name--app { font-weight: 300; color: var(--text-dim); }
+	.app-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
 
-	.divider { height: 1px; margin-bottom: 1.5rem; background: var(--border); }
+	.connector { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+	.connector-line { width: 32px; height: 1px; background: var(--border); }
+	.connector-icon { color: var(--text-dim); opacity: 0.5; line-height: 1; }
+	.connector-icon :global(svg) { display: block; }
 
-	/* Heading */
-	.heading { font-family: var(--font-display); font-size: 2.5rem; font-weight: 200; color: var(--text); line-height: 1.1; margin-bottom: 0.5rem; }
-	.heading em { font-style: italic; color: var(--accent); }
+	.divider { height: 1px; margin-bottom: 1.25rem; background: var(--border); }
 
-	.signed-as { font-size: 0.8125rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+	.signed-as { text-align: center; font-size: 0.8125rem; color: var(--text-dim); margin-bottom: 1.25rem; }
 	.signed-as strong { color: var(--text); font-weight: 400; }
 
 	.err { padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); border-radius: var(--radius-md); font-size: 0.8125rem; color: #e88383; animation: fadeUp 0.25s ease; }
 
-	/* Certificate */
-	.cert { padding: 1.25rem 1.5rem; margin-bottom: 1.375rem; border: 1px solid var(--border); border-radius: var(--radius-lg); }
-	.cert-label { font-family: var(--font-body); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
-	.cert-name { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--text); line-height: 1.2; margin-bottom: 0.25rem; }
-	.cert-want { font-size: 0.8125rem; color: var(--text-dim); }
+	.scopes-label { font-family: var(--font-body); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.625rem; }
 
 	/* Scopes */
 	.scopes { list-style: none; display: flex; flex-direction: column; gap: 0.375rem; margin-bottom: 1.75rem; }
