@@ -49,9 +49,9 @@ async function userinfo(request: Request): Promise<Response> {
 		return json({ error: 'invalid_token', error_description: 'Invalid or expired token' }, { status: 401 });
 	}
 
-	const sub = payload.sub as string | undefined;
+	const sub = (payload.sub as string) ?? (payload.jti as string);
 	if (!sub) {
-		return json({ error: 'invalid_token', error_description: 'Token has no sub claim' }, { status: 401 });
+		return json({ error: 'invalid_token', error_description: 'No sub or jti', _payload: payload }, { status: 401 });
 	}
 
 	const [user] = await db

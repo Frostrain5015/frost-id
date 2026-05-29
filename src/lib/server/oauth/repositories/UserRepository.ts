@@ -12,6 +12,12 @@ export class UserRepository implements OAuthUserRepository {
 		_grantType: GrantIdentifier,
 		_client: OAuthClient
 	): Promise<OAuthUser | undefined> {
+		// During authorization_code grant, the library passes the user ID as
+		// identifier with no password — just return { id } to propagate sub.
+		if (!password) {
+			return { id: identifier };
+		}
+
 		const [user] = await db
 			.select()
 			.from(users)
