@@ -6,11 +6,7 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter(),
-		csrf: {
-			// OAuth endpoints are server-to-server API calls protected by PKCE and
-			// client credentials — they don't need browser CSRF origin checking.
-			checkOrigin: false
-		}
+		csrf: { checkOrigin: false }
 	}
 };
 

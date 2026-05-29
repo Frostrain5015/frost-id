@@ -17,6 +17,17 @@
 
 	onMount(() => { mounted = true; });
 
+	// Deterministic accent color from app name
+	const appInitial = $derived(data.clientName[0]?.toUpperCase() ?? '?');
+	const appColor   = $derived(hashColor(data.clientName));
+
+	function hashColor(name: string): string {
+		const palette = ['#ec8f6a', '#6aad8f', '#7a9ec7', '#c77a9e', '#a88dc7', '#d4a86a', '#6aafb4', '#b48a7a'];
+		let h = 0;
+		for (let i = 0; i < name.length; i++) h = ((h << 5) - h) + name.charCodeAt(i);
+		return palette[Math.abs(h) % palette.length];
+	}
+
 	interface ScopeMeta { label: string; desc: string; icon: string; }
 
 	function scopeInfo(name: string): ScopeMeta {
@@ -41,30 +52,31 @@
 	<main class="wrap" class:mounted>
 		<div class="card">
 
-			<!-- Dual-brand header: Frost ID ⟷ Application -->
+			<!-- Dual-brand header -->
 			<div class="dual-brand">
 				<div class="brand-block">
-					<span class="brand-icon brand-mark" aria-hidden="true">❄</span>
-					<h2 class="brand-name"><span class="frost">Frost</span>&thinsp;<strong>ID</strong></h2>
+					<div class="brand-icon-wrap">
+						<span class="brand-icon" aria-hidden="true">❄</span>
+						<div class="brand-glow" aria-hidden="true"></div>
+					</div>
+					<h2 class="brand-label"><span class="frost">Frost</span>&thinsp;<strong>ID</strong></h2>
+					<p class="brand-role">Identity Provider</p>
 				</div>
 
 				<div class="connector" aria-hidden="true">
 					<div class="connector-line"></div>
-					<div class="connector-icon">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M4 12h16" /><path d="M14 6l6 6-6 6" />
-						</svg>
-					</div>
+					<div class="connector-dot"></div>
 					<div class="connector-line"></div>
 				</div>
 
 				<div class="brand-block brand-block--app">
-					<div class="app-icon" aria-hidden="true">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M3 3l18 18" /><path d="M21 3L3 21" />
-						</svg>
+					<div class="app-icon-wrap">
+						<div class="app-icon" style="background: linear-gradient(135deg, {appColor}22, {appColor}44); border-color: {appColor}55;">
+							<span class="app-initial" style="color: {appColor}">{appInitial}</span>
+						</div>
 					</div>
-					<h2 class="brand-name brand-name--app">{data.clientName}</h2>
+					<h2 class="brand-label brand-label--app">{data.clientName}</h2>
+					<p class="brand-role brand-role--app">Requesting application</p>
 				</div>
 			</div>
 
@@ -72,7 +84,10 @@
 
 			<!-- Signed-in user -->
 			<p class="signed-as">
-				{$t('consent.signed_as')}&nbsp;<strong>{data.user.email}</strong>
+				<svg class="user-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+				</svg>
+				<span>{$t('consent.signed_as')}&nbsp;<strong>{data.user.email}</strong></span>
 			</p>
 
 			{#if form?.errorKey}
@@ -105,21 +120,17 @@
 
 			<!-- Action buttons -->
 			<div class="actions">
-				<form
-					method="POST" action="?/deny"
+				<form method="POST" action="?/deny"
 					use:enhance={() => {
 						denying = true;
 						return async ({ update }) => { await update(); denying = false; };
 					}}
 				>
 					<input type="hidden" name="pid" value={data.pid} />
-					<button type="submit" class="btn-deny" disabled={approving || denying}>
-						{$t('consent.deny')}
-					</button>
+					<button type="submit" class="btn-deny" disabled={approving || denying}>{$t('consent.deny')}</button>
 				</form>
 
-				<form
-					method="POST" action="?/approve"
+				<form method="POST" action="?/approve"
 					use:enhance={() => {
 						approving = true;
 						return async ({ update }) => { await update(); approving = false; };
@@ -134,6 +145,7 @@
 									stroke-linecap="round"/>
 							</svg>
 						{:else}
+							<span aria-hidden="true">✓</span>
 							{$t('consent.approve')}
 						{/if}
 					</button>
@@ -157,32 +169,49 @@
 	.wrap.mounted { opacity: 1; transform: translateY(0); }
 	.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.75rem 2.5rem 2rem; }
 
-	/* Dual-brand */
-	.dual-brand { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1.25rem; }
-	.brand-block { display: flex; flex-direction: column; align-items: center; gap: 0.375rem; min-width: 0; }
-	.brand-block--app { opacity: 0.7; }
-	.brand-icon { font-size: 2.25rem; line-height: 1; }
-	.brand-name { font-family: var(--font-display); font-size: 1rem; font-weight: 200; letter-spacing: 0.06em; color: var(--text); line-height: 1; white-space: nowrap; }
-	.brand-name strong { font-weight: 500; }
-	.brand-name .frost { color: var(--accent); }
-	.brand-name--app { font-weight: 300; color: var(--text-dim); }
-	.app-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
+	/* ── Dual-brand ─────────────────────────────────────── */
+	.dual-brand { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+	.brand-block { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; flex: 1; }
+	.brand-block--app { opacity: 0.75; }
 
-	.connector { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
-	.connector-line { width: 32px; height: 1px; background: var(--border); }
-	.connector-icon { color: var(--text-dim); opacity: 0.5; line-height: 1; }
-	.connector-icon :global(svg) { display: block; }
+	.brand-icon-wrap { position: relative; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+	.brand-icon { font-size: 2.5rem; line-height: 1; position: relative; z-index: 1; }
+	.brand-glow { position: absolute; inset: -4px; background: radial-gradient(circle, rgba(113,118,170,0.15) 0%, transparent 70%); }
+
+	.app-icon-wrap { position: relative; }
+	.app-icon {
+		width: 48px; height: 48px; border-radius: 14px;
+		display: flex; align-items: center; justify-content: center;
+		border: 1.5px solid;
+		backdrop-filter: blur(4px);
+		transition: transform 0.2s, box-shadow 0.2s;
+	}
+	.app-icon:hover { transform: scale(1.05); }
+	.app-initial { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; }
+
+	.brand-label { font-family: var(--font-display); font-size: 1rem; font-weight: 200; letter-spacing: 0.06em; color: var(--text); line-height: 1; white-space: nowrap; }
+	.brand-label strong { font-weight: 500; }
+	.brand-label .frost { color: var(--accent); }
+	.brand-label--app { font-weight: 300; color: var(--text-dim); letter-spacing: 0.04em; }
+
+	.brand-role { font-family: var(--font-body); font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); opacity: 0.4; }
+	.brand-role--app { opacity: 0.3; }
+
+	.connector { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+	.connector-line { width: 28px; height: 1px; background: var(--border); }
+	.connector-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-dim); opacity: 0.3; }
 
 	.divider { height: 1px; margin-bottom: 1.25rem; background: var(--border); }
 
-	.signed-as { text-align: center; font-size: 0.8125rem; color: var(--text-dim); margin-bottom: 1.25rem; }
+	/* ── Signed-as ─────────────────────────────────────── */
+	.signed-as { display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.8125rem; color: var(--text-dim); margin-bottom: 1.25rem; }
 	.signed-as strong { color: var(--text); font-weight: 400; }
+	.user-icon { opacity: 0.5; flex-shrink: 0; }
 
-	.err { padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); border-radius: var(--radius-md); font-size: 0.8125rem; color: #e88383; animation: fadeUp 0.25s ease; }
+	.err { padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); border-radius: var(--radius-md); font-size: 0.8125rem; color: #e88383; text-align: center; animation: fadeUp 0.25s ease; }
 
 	.scopes-label { font-family: var(--font-body); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.625rem; }
 
-	/* Scopes */
 	.scopes { list-style: none; display: flex; flex-direction: column; gap: 0.375rem; margin-bottom: 1.75rem; }
 	.scope { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); cursor: default; transition: border-color 0.15s, background 0.15s; }
 	.scope--hover { border-color: var(--border-hi); background: rgba(255,255,255,0.02); }
@@ -192,14 +221,13 @@
 	.scope-desc { font-size: 0.75rem; color: var(--text-dim); }
 	.scope-check { font-size: 0.65rem; color: var(--accent-hi); animation: fadeUp 0.15s ease; }
 
-	/* Actions */
-	.actions { display: flex; gap: 0.75rem; }
+	.actions { display: flex; gap: 0.75rem; margin-top: 0; }
 	.actions form { display: contents; }
 
 	.btn-deny {
 		flex: 0 0 auto; min-width: 100px; height: 48px;
 		display: flex; align-items: center; justify-content: center;
-		padding: 0 1rem;
+		padding: 0 1.25rem;
 		font-family: var(--font-display); font-size: 0.8125rem; font-weight: 400;
 		letter-spacing: 0.1em; text-transform: uppercase;
 		color: var(--text-dim);
@@ -215,6 +243,7 @@
 	.btn-approve {
 		flex: 1; height: 48px;
 		display: flex; align-items: center; justify-content: center;
+		gap: 0.5rem;
 		font-family: var(--font-display); font-size: 0.9375rem; font-weight: 400;
 		letter-spacing: 0.14em; text-transform: uppercase;
 		color: #fff; background: var(--accent); border: none;
@@ -231,4 +260,6 @@
 
 	.foot { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.6rem; font-family: var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); opacity: 0.55; }
 	.foot-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--text-dim); opacity: 0.35; }
+
+	@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 </style>
