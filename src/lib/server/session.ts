@@ -4,7 +4,7 @@ import { db } from './db/client.js';
 import { sessions, users, scopes } from './db/schema.js';
 import { eq, lt } from 'drizzle-orm';
 import type { Cookies } from '@sveltejs/kit';
-import { ADMIN_EMAIL, ADMIN_PASSWORD } from '$env/static/private';
+import { ADMIN_EMAIL, ADMIN_PASSWORD, APP_URL } from '$env/static/private';
 
 const SESSION_COOKIE = 'frost_session';
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -40,7 +40,7 @@ export async function createSession(userId: string, cookies: Cookies): Promise<v
 		httpOnly: true,
 		sameSite: 'lax',
 		expires: expiresAt,
-		secure: process.env.NODE_ENV === 'production'
+		secure: APP_URL.startsWith('https://')
 	});
 }
 
