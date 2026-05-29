@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { jwtVerify } from 'jose';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { JWT_SECRET } from '$env/static/private';
 import { db } from '$lib/server/db/client.js';
 import { users } from '$lib/server/db/schema.js';
@@ -9,25 +9,49 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler  = ({ request }) => userinfo(request);
 export const POST: RequestHandler = ({ request }) => userinfo(request);
 
+/** Verify an HS256 JWT using Node.js crypto (avoids jose version issues). */
+function verifyHS256(token: string, secret: string): Record<string, unknown> | null {
+	try {
+		const parts = token.split('.');
+		if (parts.length !== 3) return null;
+
+		const [header, payload, sigB64url] = parts;
+
+		// Verify signature
+		const expected = createHmac('sha256', secret)
+			.update(`${header}.${payload}`)
+			.digest();
+		const actual = Buffer.from(sigB64url, 'base64url');
+		if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return null;
+
+		// Decode payload
+		const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8')) as Record<string, unknown>;
+
+		// Check expiration
+		if (typeof data.exp === 'number' && data.exp < Date.now() / 1000) return null;
+
+		return data;
+	} catch {
+		return null;
+	}
+}
+
 async function userinfo(request: Request): Promise<Response> {
 	const auth = request.headers.get('Authorization') ?? '';
 	const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : null;
 
 	if (!token) {
-		return json({ error: 'invalid_token', error_description: 'Missing Bearer token' }, {
-			status: 401,
-			headers: { 'WWW-Authenticate': 'Bearer realm="frost-id"' }
-		});
+		return json({ error: 'invalid_token', error_description: 'Missing Bearer token' }, { status: 401 });
 	}
 
-	let sub: string;
-	try {
-		const secret = new TextEncoder().encode(JWT_SECRET);
-		const { payload } = await jwtVerify(token, secret);
-		sub = payload.sub as string;
-		if (!sub) throw new Error('JWT has no sub claim');
-	} catch {
+	const payload = verifyHS256(token, JWT_SECRET);
+	if (!payload) {
 		return json({ error: 'invalid_token', error_description: 'Invalid or expired token' }, { status: 401 });
+	}
+
+	const sub = payload.sub as string | undefined;
+	if (!sub) {
+		return json({ error: 'invalid_token', error_description: 'Token has no sub claim' }, { status: 401 });
 	}
 
 	const [user] = await db
