@@ -11,7 +11,7 @@ export const load: PageServerLoad = async () => {
 		.select({
 			id: users.id,
 			email: users.email,
-			name: users.name,
+			username: users.username,
 			isAdmin: users.isAdmin,
 			createdAt: users.createdAt
 		})
@@ -23,16 +23,16 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	create: async ({ request }) => {
 		const data = await request.formData();
-		const email = (data.get('email') as string)?.trim().toLowerCase();
-		const name = (data.get('name') as string)?.trim();
-		const password = data.get('password') as string;
-		const isAdmin = data.get('admin') === 'on';
+		const username = (data.get('username') as string)?.trim();
+		const email    = (data.get('email')    as string)?.trim().toLowerCase();
+		const password =  data.get('password') as string;
+		const isAdmin  =  data.get('admin') === 'on';
 
-		if (!email || !name || !password) return fail(400, { errorKey: 'users.err_fields' });
+		if (!username || !email || !password) return fail(400, { errorKey: 'users.err_fields' });
 		if (password.length < 8) return fail(400, { errorKey: 'users.err_password' });
 
 		const passwordHash = await bcrypt.hash(password, 12);
-		await db.insert(users).values({ id: nanoid(36), email, name, passwordHash, isAdmin });
+		await db.insert(users).values({ id: nanoid(36), email, username, passwordHash, isAdmin });
 		return { created: true };
 	},
 

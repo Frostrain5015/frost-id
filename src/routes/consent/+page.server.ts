@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		pid,
 		clientName: authRequest.client.name,
 		scopes: authRequest.scopes.map((s) => s.name),
-		user: { name: locals.user.name, email: locals.user.email }
+		user: { email: locals.user.email }
 	};
 };
 

@@ -28,9 +28,9 @@
 
 <!-- Profile card -->
 <div class="profile-card surface anim-item" style="animation-delay:0.04s">
-	<div class="profile-avatar">{data.user.email[0].toUpperCase()}</div>
+	<div class="profile-avatar">{data.user.username[0].toUpperCase()}</div>
 	<div class="profile-body">
-		<p class="profile-name">{data.user.name}</p>
+		<p class="profile-name">{data.user.username}</p>
 		<p class="profile-email">{data.user.email}</p>
 		<span class="badge badge--muted">{$t('users.badge_user')}</span>
 	</div>

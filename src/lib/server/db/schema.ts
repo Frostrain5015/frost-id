@@ -23,12 +23,15 @@ export const users = mysqlTable(
 	{
 		id: varchar('id', { length: 36 }).primaryKey(),
 		email: varchar('email', { length: 255 }).notNull().unique(),
+		username: varchar('username', { length: 255 }).notNull().unique(),
 		passwordHash: varchar('password_hash', { length: 255 }).notNull(),
-		name: varchar('name', { length: 255 }).notNull(),
 		isAdmin: boolean('is_admin').notNull().default(false),
 		createdAt: timestamp('created_at').notNull().defaultNow()
 	},
-	(t) => ({ emailIdx: index('users_email_idx').on(t.email) })
+	(t) => ({
+		emailIdx: index('users_email_idx').on(t.email),
+		usernameIdx: index('users_username_idx').on(t.username)
+	})
 );
 
 export const authCodes = mysqlTable(
@@ -85,6 +88,7 @@ export const sessions = mysqlTable(
 
 export type Client = typeof clients.$inferSelect;
 export type User = typeof users.$inferSelect;
+
 export const verificationCodes = mysqlTable(
 	'verification_codes',
 	{
@@ -98,7 +102,22 @@ export const verificationCodes = mysqlTable(
 	(t) => ({ emailIdx: index('vc_email_idx').on(t.email) })
 );
 
+export const pendingRegistrations = mysqlTable(
+	'pending_registrations',
+	{
+		id: varchar('id', { length: 36 }).primaryKey(),
+		username: varchar('username', { length: 255 }).notNull(),
+		email: varchar('email', { length: 255 }).notNull(),
+		passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+		oauthParams: varchar('oauth_params', { length: 2048 }),
+		expiresAt: timestamp('expires_at').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(t) => ({ emailIdx: index('pr_email_idx').on(t.email) })
+);
+
 export type AuthCode = typeof authCodes.$inferSelect;
 export type AccessToken = typeof accessTokens.$inferSelect;
 export type Scope = typeof scopes.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
+export type PendingRegistration = typeof pendingRegistrations.$inferSelect;

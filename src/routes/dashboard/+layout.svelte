@@ -60,7 +60,7 @@
 		<div class="sidebar-foot">
 			<div class="user-block">
 				<div class="user-avatar" aria-hidden="true">
-					{data.user.email[0].toUpperCase()}
+					{data.user.username[0].toUpperCase()}
 				</div>
 				<div class="user-info">
 					<p class="user-email" title={data.user.email}>{data.user.email}</p>

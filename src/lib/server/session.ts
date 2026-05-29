@@ -64,8 +64,8 @@ export async function ensureSeeded(): Promise<void> {
 	await db.insert(users).values({
 		id: nanoid(36),
 		email: ADMIN_EMAIL,
+		username: 'admin',
 		passwordHash,
-		name: 'Administrator',
 		isAdmin: true
 	});
 

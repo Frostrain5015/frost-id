@@ -67,9 +67,9 @@
 			>
 				<div class="create-grid">
 					<div class="field">
-						<input type="text" id="name" name="name"
-							placeholder="name" required autocomplete="off" />
-						<label for="name">{$t('users.form_name')}</label>
+						<input type="text" id="username" name="username"
+							placeholder="username" required autocomplete="off" />
+						<label for="username">{$t('users.form_username')}</label>
 					</div>
 					<div class="field">
 						<input type="email" id="email" name="email"
@@ -119,9 +119,9 @@
 					<tr>
 						<td>
 							<div class="user-cell">
-								<div class="user-avatar" aria-hidden="true">{user.email[0].toUpperCase()}</div>
+								<div class="user-avatar" aria-hidden="true">{user.username[0].toUpperCase()}</div>
 								<div>
-									<p class="user-name">{user.name}</p>
+									<p class="user-name">{user.username}</p>
 									<p class="user-email">{user.email}</p>
 								</div>
 							</div>
@@ -140,7 +140,7 @@
 								<button
 									type="submit"
 									class="btn-ghost del-btn"
-									aria-label={$t('users.delete_aria', { name: user.name })}
+									aria-label={$t('users.delete_aria', { name: user.username })}
 									onclick={(e) => {
 										if (!confirm($t('users.delete_confirm', { email: user.email }))) {
 											e.preventDefault();
