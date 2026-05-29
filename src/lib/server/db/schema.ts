@@ -25,6 +25,7 @@ export const users = mysqlTable(
 		email: varchar('email', { length: 255 }).notNull().unique(),
 		username: varchar('username', { length: 255 }).notNull().unique(),
 		passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+		avatarUrl: varchar('avatar_url', { length: 512 }),
 		isAdmin: boolean('is_admin').notNull().default(false),
 		createdAt: timestamp('created_at').notNull().defaultNow()
 	},

@@ -5,6 +5,7 @@ declare global {
 				id: string;
 				email: string;
 				username: string;
+				avatarUrl: string | null;
 				isAdmin: boolean;
 			};
 		}

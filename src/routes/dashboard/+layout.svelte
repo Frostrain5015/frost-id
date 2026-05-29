@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { getContext } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import type { LayoutData } from './$types';
@@ -12,12 +13,12 @@
 	let sidebarOpen = $state(false);
 
 	const NAV = [
-		{ href: '/dashboard',       labelKey: 'dashboard.nav.overview', glyph: '◈' },
-		{ href: '/dashboard#apps',  labelKey: 'dashboard.nav.apps',    glyph: '◉' }
+		{ href: '/dashboard', labelKey: 'dashboard.nav.overview', glyph: '◈' },
+		{ href: '/dashboard/account', labelKey: 'dashboard.nav.account', glyph: '⚙' }
 	];
 
 	function isActive(href: string): boolean {
-		return globalThis.location?.pathname === href;
+		return $page.url.pathname === href;
 	}
 </script>
 
@@ -32,13 +33,12 @@
 
 	<aside class="sidebar" class:sidebar--open={sidebarOpen} aria-label={$t('dashboard.nav.aria')}>
 		<div class="sidebar-top">
-			<div class="sb-brand">
+			<a href="/" class="sb-brand" aria-label="Frost ID Home">
 				<span class="sb-icon brand-mark" aria-hidden="true">❄</span>
 				<div>
 					<p class="sb-wordmark"><span class="frost">Frost</span>&thinsp;<strong>ID</strong></p>
-					<p class="sb-sub">{$t('dashboard.tagline')}</p>
 				</div>
-			</div>
+			</a>
 			<div class="sb-rule" aria-hidden="true"></div>
 		</div>
 
@@ -108,15 +108,14 @@
 	}
 
 	.sidebar-top { padding: 1.5rem 1.25rem 0; }
-	.sb-brand { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 1.25rem; }
+	.sb-brand { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 1.25rem; text-decoration: none; color: inherit; }
 	.sb-icon { font-size: 1.8rem; }
 	.sb-wordmark { font-family: var(--font-display); font-size: 1.25rem; font-weight: 200; color: var(--text); letter-spacing: 0.08em; line-height: 1; }
 	.sb-wordmark strong { font-weight: 600; }
 	.sb-wordmark .frost { color: var(--accent); }
-	.sb-sub { font-family: var(--font-body); font-size: 0.5rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); opacity: 0.6; margin-top: 2px; }
 	.sb-rule { height: 1px; background: var(--border); }
 	.sb-nav { flex: 1; padding: 0.5rem 0; overflow-y: auto; }
-	.nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 1.25rem; font-family: var(--font-body); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; border-left: 2px solid transparent; transition: color 0.15s, background 0.15s, border-color 0.15s; cursor: pointer; }
+	.nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 1.25rem; font-family: var(--font-body); font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; border-left: 2px solid transparent; transition: color 0.15s, background 0.15s, border-color 0.15s; cursor: pointer; }
 	.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
 	.nav-item--active { color: var(--accent); background: rgba(113,118,170,0.06); border-left-color: var(--accent); }
 	.nav-glyph { font-size: 0.75rem; opacity: 0.6; flex-shrink: 0; }

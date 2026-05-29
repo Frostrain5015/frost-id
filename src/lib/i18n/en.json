@@ -77,13 +77,13 @@
     "err_generic": "Authorization failed.",
     "scope": {
       "openid_label": "Identity",
-      "openid_desc": "Your unique identity token",
+      "openid_desc": "",
       "profile_label": "Profile",
-      "profile_desc": "Name and profile information",
+      "profile_desc": "",
       "email_label": "Email",
-      "email_desc": "Your email address",
+      "email_desc": "",
       "offline_access_label": "Offline Access",
-      "offline_access_desc": "Stay signed in with refresh tokens"
+      "offline_access_desc": ""
     }
   },
   "dashboard": {
@@ -105,8 +105,69 @@
     },
     "nav": {
       "overview": "Overview",
-      "apps": "Applications",
+      "account": "Account",
       "aria": "Dashboard navigation"
+    },
+    "account": {
+      "heading": "Account Settings",
+      "profile_section": "Profile",
+      "security_section": "Security",
+      "sessions_section": "Sessions",
+      "danger_section": "Danger Zone",
+
+      "avatar_label": "Avatar",
+      "avatar_upload": "Choose file",
+      "avatar_uploading": "Uploading…",
+      "avatar_remove": "Remove",
+      "avatar_failed": "Upload failed",
+      "avatar_saved": "Avatar updated",
+
+      "username_label": "Username",
+      "username_save": "Save",
+      "username_saving": "Saving…",
+      "username_saved": "Username updated",
+      "username_invalid": "Letters, numbers, and underscores only (2-32 chars)",
+      "username_taken": "This username is already taken",
+
+      "email_label": "Email address",
+      "email_change_btn": "Change email",
+      "email_new_label": "New email address",
+      "email_code_label": "Verification code",
+      "email_code_placeholder": "000000",
+      "email_send_code": "Send code",
+      "email_sending": "Sending…",
+      "email_code_sent": "Code sent — check your inbox",
+      "email_verify": "Verify & bind",
+      "email_verifying": "Verifying…",
+      "email_changed": "Email address updated",
+      "email_taken": "This email is already registered",
+      "email_invalid": "Invalid email address",
+      "email_code_invalid": "Invalid or expired code",
+      "email_cancel": "Cancel",
+
+      "password_current": "Current password",
+      "password_new": "New password (min 8 characters)",
+      "password_confirm": "Confirm new password",
+      "password_save": "Change password",
+      "password_saving": "Changing…",
+      "password_changed": "Password changed",
+      "password_wrong": "Current password is incorrect",
+      "password_short": "Password must be at least 8 characters",
+      "password_mismatch": "Passwords do not match",
+
+      "sessions_current": "Current session",
+      "sessions_location": "Location",
+      "sessions_unknown": "Unknown location",
+      "sessions_revoke": "Revoke",
+      "sessions_none": "No other active sessions",
+      "sessions_revoked": "Session revoked",
+
+      "delete_label": "Delete account",
+      "delete_desc": "This permanently deletes your account, authorized applications, and all associated data. This cannot be undone.",
+      "delete_confirm": "Type your password to confirm",
+      "delete_btn": "Delete my account",
+      "delete_deleting": "Deleting…",
+      "delete_wrong_password": "Incorrect password"
     }
   },
   "home": {
@@ -121,7 +182,7 @@
     },
     "hero": {
       "eyebrow": "Frost Tech",
-      "title": "One identity. The whole ecosystem.",
+      "title": "Make Ideas Happen",
       "lead": "Sign in once with Frost ID and move freely across the product suite built by Frost Tech.",
       "badge": "Powered by Frost ID unified identity",
       "cta_explore": "Explore Ecosystem",

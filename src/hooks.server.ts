@@ -19,6 +19,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			id: user.id,
 			email: user.email,
 			username: user.username,
+			avatarUrl: user.avatarUrl,
 			isAdmin: user.isAdmin
 		};
 	}

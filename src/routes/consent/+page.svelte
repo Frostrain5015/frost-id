@@ -141,11 +141,7 @@
 			<footer class="foot">
 				<LangToggle />
 				<span class="foot-sep" aria-hidden="true"></span>
-				<span>OAuth 2.1</span>
-				<span class="foot-sep" aria-hidden="true"></span>
-				<span>{$t('common.pkce_enforced')}</span>
-			<span class="foot-sep" aria-hidden="true"></span>
-			<span class="frost-tech"><span class="frost-spin" aria-hidden="true">❄</span> Frost Tech</span>
+				<span class="frost-tech"><span class="frost-spin" aria-hidden="true">❄</span> Frost Tech</span>
 			</footer>
 		</div>
 	</main>

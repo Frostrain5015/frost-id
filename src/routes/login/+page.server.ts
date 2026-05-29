@@ -15,6 +15,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	return { oauthParams: url.searchParams.get('oauth') };
 };
 
+function getClientIP(request: Request): string | undefined {
+	const forwarded = request.headers.get('x-forwarded-for');
+	if (forwarded) return forwarded.split(',')[0].trim();
+	return undefined;
+}
+
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const data = await request.formData();
@@ -41,7 +47,8 @@ export const actions: Actions = {
 			return fail(401, { errorKey: 'login.err_credentials' });
 		}
 
-		await createSession(user.id, cookies);
+		const ip = getClientIP(request);
+		await createSession(user.id, cookies, ip);
 
 		if (oauthParams) throw redirect(302, `/oauth/authorize?${oauthParams}`);
 		throw redirect(302, user.isAdmin ? '/admin' : '/dashboard');

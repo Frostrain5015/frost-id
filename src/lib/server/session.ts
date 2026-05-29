@@ -31,10 +31,23 @@ export async function getSessionUser(cookies: Cookies) {
 	return user ?? null;
 }
 
-export async function createSession(userId: string, cookies: Cookies): Promise<void> {
+export async function createSession(userId: string, cookies: Cookies, ip?: string): Promise<void> {
 	const id = nanoid(36);
 	const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-	await db.insert(sessions).values({ id, userId, expiresAt });
+
+	let region: string | undefined;
+	if (ip) {
+		try {
+			const resp = await fetch(`http://ip-api.com/json/${ip}?fields=city,country`, { signal: AbortSignal.timeout(3000) });
+			if (resp.ok) {
+				const geo = await resp.json() as { city?: string; country?: string };
+				const parts = [geo.city, geo.country].filter(Boolean);
+				if (parts.length > 0) region = parts.join(', ');
+			}
+		} catch { /* geo lookup failed, skip */ }
+	}
+
+	await db.insert(sessions).values({ id, userId, ip: ip ?? null, region: region ?? null, expiresAt });
 	cookies.set(SESSION_COOKIE, id, {
 		path: '/',
 		httpOnly: true,
