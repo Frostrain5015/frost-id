@@ -1,60 +1,39 @@
 import { json } from '@sveltejs/kit';
+import { jwtVerify } from 'jose';
+import { JWT_SECRET } from '$env/static/private';
 import { db } from '$lib/server/db/client.js';
-import { accessTokens, users } from '$lib/server/db/schema.js';
-import { eq, and } from 'drizzle-orm';
+import { users } from '$lib/server/db/schema.js';
+import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ request }) => {
-	return handleUserinfo(request);
-};
+export const GET: RequestHandler  = ({ request }) => userinfo(request);
+export const POST: RequestHandler = ({ request }) => userinfo(request);
 
-export const POST: RequestHandler = async ({ request }) => {
-	return handleUserinfo(request);
-};
-
-async function handleUserinfo(request: Request): Promise<Response> {
-	// Accept Bearer token from Authorization header
+async function userinfo(request: Request): Promise<Response> {
 	const auth = request.headers.get('Authorization') ?? '';
-	const bearerToken = auth.startsWith('Bearer ') ? auth.slice(7).trim() : null;
+	const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : null;
 
-	if (!bearerToken) {
-		return json({ error: 'invalid_token', error_description: 'Missing Bearer token' }, { status: 401 });
+	if (!token) {
+		return json({ error: 'invalid_token', error_description: 'Missing Bearer token' }, {
+			status: 401,
+			headers: { 'WWW-Authenticate': 'Bearer realm="frost-id"' }
+		});
 	}
 
-	// The access token is a JWT signed by Frost ID.
-	// The token's `jti` claim matches the `access_token` column in the DB.
-	// Decode the JWT payload (no verification needed for DB lookup).
-	let jti: string | null = null;
+	let sub: string;
 	try {
-		const parts = bearerToken.split('.');
-		if (parts.length === 3) {
-			const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf-8'));
-			jti = payload.jti ?? null;
-		}
+		const secret = new TextEncoder().encode(JWT_SECRET);
+		const { payload } = await jwtVerify(token, secret);
+		sub = payload.sub as string;
+		if (!sub) throw new Error('JWT has no sub claim');
 	} catch {
-		// fall through — also try looking up the raw token string
-	}
-
-	// Look up token by jti OR by the raw token string (in case issuer stores full JWT)
-	const lookup = jti ?? bearerToken;
-	const [tokenRow] = await db
-		.select()
-		.from(accessTokens)
-		.where(and(eq(accessTokens.accessToken, lookup), eq(accessTokens.revoked, false)))
-		.limit(1);
-
-	if (!tokenRow || tokenRow.accessTokenExpiresAt < new Date()) {
-		return json({ error: 'invalid_token', error_description: 'Token expired or revoked' }, { status: 401 });
-	}
-
-	if (!tokenRow.userId) {
-		return json({ error: 'invalid_token', error_description: 'No user associated with token' }, { status: 400 });
+		return json({ error: 'invalid_token', error_description: 'Invalid or expired token' }, { status: 401 });
 	}
 
 	const [user] = await db
-		.select({ id: users.id, email: users.email, username: users.username, isAdmin: users.isAdmin })
+		.select({ id: users.id, email: users.email, username: users.username })
 		.from(users)
-		.where(eq(users.id, tokenRow.userId))
+		.where(eq(users.id, sub))
 		.limit(1);
 
 	if (!user) {
