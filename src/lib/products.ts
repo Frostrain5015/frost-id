@@ -1,0 +1,51 @@
+// Static product catalogue for the Frost Tech ecosystem homepage.
+// Marketing copy (tagline / description / feature labels) lives in i18n under
+// `home.products.<key>.*`; this file holds only the structural/brand data.
+// `name` must match AppIcon's detection (Investory / Blades of Hex / PP Typeset).
+
+export interface Product {
+	/** i18n + AppIcon key */
+	key: 'investory' | 'blades' | 'pp';
+	/** Display name (also drives AppIcon logo selection) */
+	name: string;
+	/** Primary brand colour — used ONLY as a restrained accent on the card */
+	brand: string;
+	/** Optional secondary brand colour (gradient/glow) */
+	brandAlt?: string;
+	/** Public hosted URL */
+	url: string;
+	/** Owned product vs strategic partner */
+	kind: 'owned' | 'partner';
+	/** Number of feature chips to read from i18n (home.products.<key>.f1..fN) */
+	featureCount: number;
+}
+
+export const products: Product[] = [
+	{
+		key: 'investory',
+		name: 'Investory',
+		brand: '#863bff',
+		brandAlt: '#47bfff',
+		url: 'https://116.62.179.231:8443/investory/',
+		kind: 'owned',
+		featureCount: 3
+	},
+	{
+		key: 'blades',
+		name: 'Blades of Hex',
+		brand: '#ffd700',
+		brandAlt: '#ffe066',
+		url: 'http://116.62.179.231:3000',
+		kind: 'owned',
+		featureCount: 3
+	},
+	{
+		key: 'pp',
+		name: 'PP Typeset',
+		brand: '#ea580c',
+		brandAlt: '#fb923c',
+		url: 'https://116.62.179.231:4081',
+		kind: 'partner',
+		featureCount: 3
+	}
+];

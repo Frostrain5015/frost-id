@@ -1,36 +1,32 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { getContext } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import type { PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
+	import AppIcon from '$lib/components/AppIcon.svelte';
 
 	let { data }: { data: PageData } = $props();
 
 	const t = getContext<Readable<Translator>>('t');
 
-	// Investory brand icon (simplified favicon)
-	const investorySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`;
-
-	function isInvestory(name: string): boolean { return name.toLowerCase().includes('investory'); }
-
-	function hashColor(name: string): string {
-		const palette = ['#ec8f6a', '#6aad8f', '#7a9ec7', '#c77a9e', '#a88dc7', '#d4a86a', '#6aafb4', '#b48a7a'];
-		let h = 0;
-		for (let i = 0; i < name.length; i++) h = ((h << 5) - h) + name.charCodeAt(i);
-		return palette[Math.abs(h) % palette.length];
-	}
-
 	function relativeTime(date: Date | string): string {
 		const diff = Date.now() - new Date(date).getTime();
 		const mins = Math.floor(diff / 60000);
-		if (mins < 1) return 'Just now';
-		if (mins < 60) return `${mins}m ago`;
+		if (mins < 1) return $t('dashboard.time.just_now');
+		if (mins < 60) return $t('dashboard.time.minutes', { n: String(mins) });
 		const hours = Math.floor(mins / 60);
-		if (hours < 24) return `${hours}h ago`;
+		if (hours < 24) return $t('dashboard.time.hours', { n: String(hours) });
 		const days = Math.floor(hours / 24);
-		if (days < 30) return `${days}d ago`;
+		if (days < 30) return $t('dashboard.time.days', { n: String(days) });
 		const months = Math.floor(days / 30);
-		return `${months}mo ago`;
+		return $t('dashboard.time.months', { n: String(months) });
+	}
+
+	// Reuse the consent screen's scope labels; fall back to the raw scope name.
+	function scopeLabel(s: string): string {
+		const l = $t(`consent.scope.${s}_label`);
+		return l === `consent.scope.${s}_label` ? s : l;
 	}
 </script>
 
@@ -57,7 +53,7 @@
 	</div>
 
 	<!-- Apps section -->
-	<div class="section-head" style="--anim-delay: 0.08s">
+	<div id="apps" class="section-head" style="--anim-delay: 0.08s">
 		<h3 class="section-title">{$t('dashboard.apps_section')}</h3>
 	</div>
 
@@ -66,23 +62,33 @@
 			{#each data.clients as client}
 				<div class="app-card">
 					<div class="app-card-top">
-						{#if isInvestory(client.name)}
-							<div class="app-icon investory-icon">{@html investorySvg}</div>
-						{:else}
-							<div class="app-icon" style="background: linear-gradient(135deg, {hashColor(client.name)}18, {hashColor(client.name)}35); border-color: {hashColor(client.name)}55; color: {hashColor(client.name)}">
-								<span class="app-letter">{client.name[0].toUpperCase()}</span>
-							</div>
-						{/if}
+						<AppIcon name={client.name} size={40} />
 						<div class="app-meta">
 							<h4 class="app-name">{client.name}</h4>
-							<p class="app-date">{relativeTime(client.createdAt)}</p>
+							<p class="app-date">{$t('dashboard.granted', { time: relativeTime(client.grantedAt) })}</p>
 						</div>
+						<form
+							method="POST"
+							action="?/revoke"
+							use:enhance={() => ({ update }) => update()}
+						>
+							<input type="hidden" name="clientId" value={client.id} />
+							<button
+								type="submit"
+								class="revoke-btn"
+								onclick={(e) => {
+									if (!confirm($t('dashboard.revoke_confirm', { name: client.name }))) {
+										e.preventDefault();
+									}
+								}}
+							>{$t('dashboard.revoke')}</button>
+						</form>
 					</div>
 
 					{#if client.scopes.length > 0}
 						<div class="app-scopes">
 							{#each client.scopes as s}
-								<span class="tag tag--accent">{s}</span>
+								<span class="tag tag--accent">{scopeLabel(s)}</span>
 							{/each}
 						</div>
 					{/if}
@@ -134,18 +140,10 @@
 	}
 
 	.app-card-top { display: flex; align-items: center; gap: 0.75rem; }
-	.investory-icon { background: #10b981 !important; border-color: transparent !important; }
-	.investory-icon :global(svg) { width: 20px; height: 20px; display: block; color: #fff; }
-	.app-icon {
-		width: 40px; height: 40px; border-radius: 12px;
-		display: flex; align-items: center; justify-content: center;
-		border: 1.5px solid;
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 500;
-		flex-shrink: 0;
-	}
 	.app-meta { flex: 1; min-width: 0; }
+	.revoke-btn { flex-shrink: 0; padding: 0.4rem 0.85rem; font-family: var(--font-display); font-size: 0.7rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+	.revoke-btn:hover { color: var(--error); border-color: rgba(217,92,92,0.35); background: rgba(217,92,92,0.05); }
+	.revoke-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 	.app-name { font-family: var(--font-display); font-size: 0.95rem; font-weight: 400; color: var(--text); letter-spacing: 0.02em; }
 	.app-date { font-family: var(--font-body); font-size: 0.6875rem; color: var(--text-dim); opacity: 0.5; margin-top: 1px; }
 

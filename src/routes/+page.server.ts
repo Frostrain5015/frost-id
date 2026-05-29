@@ -1,8 +1,7 @@
-import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
+// The root "/" is the public Frost Tech ecosystem homepage for everyone.
+// Logged-in users simply get an account menu in the nav (no redirect).
 export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.user?.isAdmin) throw redirect(302, '/admin');
-	if (locals.user) throw redirect(302, '/dashboard');
-	throw redirect(302, '/login');
+	return { user: locals.user ?? null };
 };

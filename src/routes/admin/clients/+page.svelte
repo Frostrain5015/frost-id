@@ -4,6 +4,7 @@
 	import type { Readable } from 'svelte/store';
 	import type { ActionData, PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
+	import AppIcon from '$lib/components/AppIcon.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -191,14 +192,17 @@
 				{#each data.clients as client}
 					<tr>
 						<td>
-							<div class="client-name-cell">
-								<span class="client-name">{client.name}</span>
-								<span class="client-id">{client.id.slice(0, 12)}…</span>
-								{#if !client.secret}
-									<span class="badge badge--muted">{$t('clients.badge_public')}</span>
-								{:else}
-									<span class="badge badge--accent">{$t('clients.badge_confidential')}</span>
-								{/if}
+							<div class="client-app">
+								<AppIcon name={client.name} size={34} />
+								<div class="client-name-cell">
+									<span class="client-name">{client.name}</span>
+									<span class="client-id">{client.id.slice(0, 12)}…</span>
+									{#if !client.secret}
+										<span class="badge badge--muted">{$t('clients.badge_public')}</span>
+									{:else}
+										<span class="badge badge--accent">{$t('clients.badge_confidential')}</span>
+									{/if}
+								</div>
 							</div>
 						</td>
 						<td>
@@ -300,6 +304,7 @@
 	.dots span:nth-child(2) { animation-delay: 0.18s; }
 	.dots span:nth-child(3) { animation-delay: 0.36s; }
 	.table-wrap { overflow-x: auto; }
+	.client-app { display: flex; align-items: center; gap: 0.75rem; }
 	.client-name-cell { display: flex; flex-direction: column; gap: 3px; }
 	.client-name { font-weight: 400; color: var(--text); }
 	.client-id { font-size: 0.7rem; color: var(--text-dim); font-family: monospace; }

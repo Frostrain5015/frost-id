@@ -5,6 +5,7 @@
 	import type { ActionData, PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
 	import LangToggle from '$lib/components/LangToggle.svelte';
+	import AppIcon from '$lib/components/AppIcon.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -16,23 +17,6 @@
 	let hoveredScope = $state<string | null>(null);
 
 	onMount(() => { mounted = true; });
-
-	// Investory brand icon (TrendingUp SVG)
-	const investorySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`;
-
-	// App icon detection
-	const appName = $derived(data.clientName.toLowerCase());
-	const isInvestory  = $derived(appName.includes('investory') || appName === 'investory');
-	const isPPTypeset  = $derived(appName.includes('pp') || appName.includes('typeset'));
-	const appInitial   = $derived(data.clientName[0]?.toUpperCase() ?? '?');
-	const appColor     = $derived(hashColor(data.clientName));
-
-	function hashColor(name: string): string {
-		const palette = ['#ec8f6a', '#6aad8f', '#7a9ec7', '#c77a9e', '#a88dc7', '#d4a86a', '#6aafb4', '#b48a7a'];
-		let h = 0;
-		for (let i = 0; i < name.length; i++) h = ((h << 5) - h) + name.charCodeAt(i);
-		return palette[Math.abs(h) % palette.length];
-	}
 
 	interface ScopeMeta { label: string; desc: string; icon: string; }
 
@@ -66,7 +50,6 @@
 						<div class="brand-glow" aria-hidden="true"></div>
 					</div>
 					<h2 class="brand-label"><span class="frost">Frost</span>&thinsp;<strong>ID</strong></h2>
-					<p class="brand-role">Identity Provider</p>
 				</div>
 
 				<div class="connector" aria-hidden="true">
@@ -77,18 +60,9 @@
 
 				<div class="brand-block brand-block--app">
 					<div class="app-icon-wrap">
-						{#if isInvestory}
-							<div class="investory-logo" aria-hidden="true">{@html investorySvg}</div>
-						{:else if isPPTypeset}
-							<div class="pp-logo" aria-hidden="true"><em>PP</em></div>
-						{:else}
-							<div class="app-icon" style="background: linear-gradient(135deg, {appColor}22, {appColor}44); border-color: {appColor}55;">
-								<span class="app-initial" style="color: {appColor}">{appInitial}</span>
-							</div>
-						{/if}
+						<AppIcon name={data.clientName} size={48} />
 					</div>
 					<h2 class="brand-label brand-label--app">{data.clientName}</h2>
-					<p class="brand-role brand-role--app">Requesting application</p>
 				</div>
 			</div>
 
@@ -193,27 +167,12 @@
 	.brand-glow { position: absolute; inset: -4px; background: radial-gradient(circle, rgba(113,118,170,0.15) 0%, transparent 70%); }
 
 	.app-icon-wrap { position: relative; }
-	.investory-logo { width: 48px; height: 48px; border-radius: 12px; background: #10b981; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-	.investory-logo :global(svg) { width: 24px; height: 24px; display: block; color: #fff; }
-	.pp-logo { width: 48px; height: 48px; border-radius: 14px; background: #0A0A0D; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-	.pp-logo em { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; font-size: 1.375rem; font-weight: 700; color: #ea580c; }
-	.app-icon {
-		width: 48px; height: 48px; border-radius: 14px;
-		display: flex; align-items: center; justify-content: center;
-		border: 1.5px solid;
-		backdrop-filter: blur(4px);
-		transition: transform 0.2s, box-shadow 0.2s;
-	}
-	.app-icon:hover { transform: scale(1.05); }
-	.app-initial { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; }
 
 	.brand-label { font-family: var(--font-display); font-size: 1rem; font-weight: 200; letter-spacing: 0.06em; color: var(--text); line-height: 1.15; white-space: nowrap; text-align: center; }
 	.brand-label strong { font-weight: 500; }
 	.brand-label .frost { color: var(--accent); }
 	.brand-label--app { font-weight: 300; color: var(--text-dim); letter-spacing: 0.04em; }
 
-	.brand-role { font-family: var(--font-body); font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); opacity: 0.4; }
-	.brand-role--app { opacity: 0.3; }
 
 	.connector { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
 	.connector-line { width: 28px; height: 1px; background: var(--border); }

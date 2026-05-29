@@ -13,7 +13,7 @@
 
 	const NAV = [
 		{ href: '/dashboard',       labelKey: 'dashboard.nav.overview', glyph: '◈' },
-		{ href: '/dashboard/apps',  labelKey: 'dashboard.nav.apps',    glyph: '◉' }
+		{ href: '/dashboard#apps',  labelKey: 'dashboard.nav.apps',    glyph: '◉' }
 	];
 
 	function isActive(href: string): boolean {

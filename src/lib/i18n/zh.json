@@ -90,13 +90,87 @@
     "page_title": "控制台 — Frost ID",
     "tagline": "用户控制台",
     "heading": "控制台",
-    "subtitle": "您的账户概览",
-    "apps_section": "已关联的应用程序",
-    "apps_empty": "暂无已注册的应用程序。",
+    "subtitle": "您的Frost ID",
+    "apps_section": "已授权的应用程序",
+    "apps_empty": "您还没有授权任何应用程序。",
+    "revoke": "解除授权",
+    "revoke_confirm": "确定要解除「{name}」的授权吗？该应用将无法再访问您的Frost ID。",
+    "granted": "授权于 {time}",
+    "time": {
+      "just_now": "刚刚",
+      "minutes": "{n} 分钟前",
+      "hours": "{n} 小时前",
+      "days": "{n} 天前",
+      "months": "{n} 个月前"
+    },
     "nav": {
       "overview": "概览",
       "apps": "应用程序",
       "aria": "控制台导航"
+    }
+  },
+  "home": {
+    "meta_title": "寒霜科技",
+    "meta_desc": "寒霜科技的产品生态，均可通过 Frost ID 登录并使用。",
+    "nav": {
+      "login": "登录",
+      "console": "控制台",
+      "authz": "授权管理",
+      "signout": "退出",
+      "menu": "账户菜单"
+    },
+    "hero": {
+      "eyebrow": "Frost Tech",
+      "title": "一个身份，连接整个生态",
+      "lead": "用 Frost ID 一次登录，畅行寒霜科技为您打造的产品矩阵",
+      "badge": "由 Frost ID 统一身份驱动",
+      "cta_explore": "浏览生态",
+      "cta_login": "登录 Frost ID",
+      "core_label": "Frost ID"
+    },
+    "ecosystem": {
+      "eyebrow": "产品生态",
+      "title": "寒霜科技旗下产品",
+      "owned": "自研产品",
+      "partner": "战略合作伙伴",
+      "visit": "访问",
+      "login_with": "用 Frost ID 登录"
+    },
+    "products": {
+      "investory": {
+        "tagline": "与时间为友 与价值同行",
+        "desc": "一站式、多市场、量化友好的投资组合追踪与研究平台",
+        "f1": "多市场实时价格追踪",
+        "f2": "量化分析与策略回测",
+        "f3": "观澜AI————专属投资智能体"
+      },
+      "blades": {
+        "tagline": "",
+        "desc": "回合制策略战棋游戏，指挥部队利用地形、士气、天气与战术卡牌获得胜利。",
+        "f1": "PVE · 本地热座 · 联网对战",
+        "f2": "多样的策略选择与战术维度",
+        "f3": "丰富的将领系统与手牌构筑"
+      },
+      "pp": {
+        "tagline": "专业排版，为 AI Native 而生",
+        "desc": "Agent友好式 Markdown / HTML 一键专业排版 PDF 的 SaaS 引擎。",
+        "f1": "Pandoc + XeLaTeX 引擎",
+        "f2": "MCP 接入 · AI 可直连",
+        "f3": "中文 CJK 排版优化"
+      }
+    },
+    "frostid": {
+      "eyebrow": "Frost ID",
+      "title": "一个账号，连接整个生态",
+      "desc": "基于 OAuth 2.1 的统一登录与授权，贯穿整个生态。你可以随时查看并解除任意应用对账户的访问权限。",
+      "cta_login": "登录",
+      "cta_authz": "授权管理"
+    },
+    "footer": {
+      "rights": "寒霜科技 Frost Tech",
+      "products": "产品",
+      "identity": "身份",
+      "made": "Powered by Frost Tech"
     }
   },
   "admin": {
