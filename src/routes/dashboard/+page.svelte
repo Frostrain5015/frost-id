@@ -8,6 +8,11 @@
 
 	const t = getContext<Readable<Translator>>('t');
 
+	// Investory brand icon (simplified favicon)
+	const investorySvg = `<svg fill="none" viewBox="0 0 48 46" xmlns="http://www.w3.org/2000/svg"><path fill="#863bff" d="M25.946 44.938c-.664.845-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.287c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.497 0-3.578-1.842-3.578H1.237c-.92 0-1.456-1.04-.92-1.788L10.013.474c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.579 1.842 3.579h11.377c.943 0 1.473 1.088.89 1.83L25.947 44.94z"/></svg>`;
+
+	function isInvestory(name: string): boolean { return name.toLowerCase().includes('investory'); }
+
 	function hashColor(name: string): string {
 		const palette = ['#ec8f6a', '#6aad8f', '#7a9ec7', '#c77a9e', '#a88dc7', '#d4a86a', '#6aafb4', '#b48a7a'];
 		let h = 0;
@@ -61,9 +66,13 @@
 			{#each data.clients as client}
 				<div class="app-card">
 					<div class="app-card-top">
-						<div class="app-icon" style="background: linear-gradient(135deg, {hashColor(client.name)}18, {hashColor(client.name)}35); border-color: {hashColor(client.name)}55; color: {hashColor(client.name)}">
-							<span class="app-letter">{client.name[0].toUpperCase()}</span>
-						</div>
+						{#if isInvestory(client.name)}
+							<div class="app-icon investory-icon">{@html investorySvg}</div>
+						{:else}
+							<div class="app-icon" style="background: linear-gradient(135deg, {hashColor(client.name)}18, {hashColor(client.name)}35); border-color: {hashColor(client.name)}55; color: {hashColor(client.name)}">
+								<span class="app-letter">{client.name[0].toUpperCase()}</span>
+							</div>
+						{/if}
 						<div class="app-meta">
 							<h4 class="app-name">{client.name}</h4>
 							<p class="app-date">{relativeTime(client.createdAt)}</p>
@@ -125,6 +134,7 @@
 	}
 
 	.app-card-top { display: flex; align-items: center; gap: 0.75rem; }
+	.investory-icon :global(svg) { display: block; width: 32px; height: 32px; filter: drop-shadow(0 0 4px rgba(134,59,255,0.25)); }
 	.app-icon {
 		width: 40px; height: 40px; border-radius: 12px;
 		display: flex; align-items: center; justify-content: center;
