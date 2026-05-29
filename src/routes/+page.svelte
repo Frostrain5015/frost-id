@@ -75,9 +75,10 @@
 	<!-- ── Frost ID identity band ────────────────────────── -->
 	<section class="frostid">
 		<div class="frostid-card up u1">
-			<span class="frostid-mark" aria-hidden="true">❄</span>
-			<p class="eyebrow">{$t('home.frostid.eyebrow')}</p>
-			<h2 class="frostid-title">{$t('home.frostid.title')}</h2>
+			<div class="frostid-brand">
+				<span class="frostid-mark" aria-hidden="true">❄</span>
+				<h2 class="frostid-wordmark"><span class="frost">Frost</span> <strong>ID</strong></h2>
+			</div>
 			<p class="frostid-desc">{$t('home.frostid.desc')}</p>
 			<div class="frostid-cta">
 				{#if data.user}
@@ -87,7 +88,6 @@
 					<a class="btn-primary" href="/login">{$t('home.frostid.cta_login')}</a>
 				{/if}
 			</div>
-			<p class="frostid-trust">OAuth 2.1 · {$t('common.pkce_enforced')}</p>
 		</div>
 	</section>
 
@@ -97,9 +97,6 @@
 <style>
 	.home { min-height: 100vh; background: var(--bg); overflow-x: hidden; }
 
-	/* One-shot entrance: fade UP into view (uses global fadeUp keyframe from app.css).
-	   `both` fill means it starts hidden on first paint and ends visible — no
-	   "appear then disappear" flash, and no JS toggle. */
 	.up { animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
 	.u1 { animation-delay: 0.05s; }
 	.u2 { animation-delay: 0.15s; }
@@ -129,10 +126,10 @@
 
 	/* ── Constellation ──────────────────────────────────── */
 	.orbit { margin-top: 3.5rem; display: flex; flex-direction: column; align-items: center; }
-	.orbit-core { position: relative; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--border-hi); background: radial-gradient(circle, rgba(113,118,170,0.22), transparent 70%); }
-	.orbit-core::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; border: 1px solid rgba(137,142,196,0.18); animation: pulse 4s ease-in-out infinite; }
-	.orbit-snow { font-size: 2rem; color: var(--accent-hi); text-shadow: 0 0 18px rgba(137,142,196,0.6); }
-	.orbit-core-label { margin-top: 0.6rem; font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
+	.orbit-core { position: relative; width: 88px; height: 88px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--border-hi); background: radial-gradient(circle, rgba(113,118,170,0.22), transparent 70%); }
+	.orbit-core::after { content: ''; position: absolute; inset: -12px; border-radius: 50%; border: 1px solid rgba(137,142,196,0.18); animation: pulse 4s ease-in-out infinite; }
+	.orbit-snow { font-size: 2.8rem; color: var(--accent-hi); text-shadow: 0 0 22px rgba(137,142,196,0.6); }
+	.orbit-core-label { margin-top: 0.5rem; font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); }
 	.orbit-stem { width: 1px; height: 34px; background: linear-gradient(var(--border-hi), transparent); }
 	.orbit-rail { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; padding-top: 0.5rem; }
 	.orbit-rail::before { content: ''; position: absolute; top: 0; left: 12%; right: 12%; height: 1px; background: linear-gradient(90deg, transparent, var(--border-hi), transparent); }
@@ -155,12 +152,14 @@
 	.frostid { padding: 4rem clamp(1rem,4vw,2.5rem) 6rem; }
 	.frostid-card { position: relative; max-width: 720px; margin: 0 auto; text-align: center; padding: 3rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; }
 	.frostid-card::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(80% 60% at 50% 0%, rgba(113,118,170,0.14), transparent 70%); }
-	.frostid-mark { position: relative; display: inline-block; font-size: 2.4rem; color: var(--accent-hi); text-shadow: 0 0 20px rgba(137,142,196,0.5); }
-	.frostid-title { position: relative; margin-top: 0.8rem; font-family: var(--font-display); font-weight: 200; font-size: clamp(1.6rem, 3.5vw, 2.4rem); color: var(--text); }
+	.frostid-brand { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem; }
+	.frostid-mark { font-size: 2.7rem; line-height: 1; color: var(--accent-hi); text-shadow: 0 0 20px rgba(137,142,196,0.5); }
+	.frostid-wordmark { font-family: var(--font-display); font-size: 1.98rem; font-weight: 200; letter-spacing: 0.08em; line-height: 1; color: var(--text); }
+	.frostid-wordmark strong { font-weight: 500; color: var(--text); }
+	.frostid-wordmark .frost { color: var(--accent); }
 	.frostid-desc { position: relative; margin: 1rem auto 0; max-width: 34rem; font-size: 0.95rem; line-height: 1.7; color: var(--text-dim); }
 	.frostid-cta { position: relative; margin-top: 1.75rem; display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; }
 	.frostid-cta :global(.btn-primary), .frostid-cta :global(.btn-ghost) { height: 46px; padding: 0 1.5rem; text-decoration: none; }
-	.frostid-trust { position: relative; margin-top: 1.5rem; font-family: var(--font-body); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); opacity: 0.6; }
 
 	@media (prefers-reduced-motion: reduce) {
 		.orbit-core::after { animation: none; }

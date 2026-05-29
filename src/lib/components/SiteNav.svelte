@@ -50,10 +50,14 @@
 		border-bottom: 1px solid var(--border);
 	}
 	.brand { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
-	.brand-snow { font-size: 1.35rem; color: var(--accent-hi); text-shadow: 0 0 12px rgba(137,142,196,0.5); line-height: 1; }
+		.brand-snow { font-size: 2rem; color: var(--accent-hi); text-shadow: 0 0 20px rgba(137,142,196,0.8); line-height: 1; animation: snowPulse 3s ease-in-out infinite; }
 	.brand-word { font-family: var(--font-display); font-size: 1.05rem; font-weight: 200; letter-spacing: 0.1em; color: var(--text); }
 	.brand-word strong { font-weight: 600; }
 	.brand-word .frost { color: var(--accent); }
+
+		@keyframes snowPulse { 0%,100% { text-shadow: 0 0 20px rgba(137,142,196,0.8); } 50% { text-shadow: 0 0 36px rgba(137,142,196,1), 0 0 60px rgba(113,118,170,0.45); } }
+		@media (prefers-reduced-motion: reduce) { .brand-snow { animation: none; } }
+
 
 	.nav-right { display: flex; align-items: center; gap: 0.75rem; }
 

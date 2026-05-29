@@ -28,7 +28,6 @@
 	});
 
 	function handleEnhance() {
-		// Client-side validation — prevents server round-trip for empty fields
 		const identifierEl = document.getElementById('identifier') as HTMLInputElement;
 		const passwordEl = document.getElementById('password') as HTMLInputElement;
 		if (!identifierEl.value.trim() || !passwordEl.value) {
@@ -122,11 +121,7 @@
 			<footer class="foot">
 				<LangToggle />
 				<span class="foot-sep" aria-hidden="true"></span>
-				<span>OAuth 2.1</span>
-				<span class="foot-sep" aria-hidden="true"></span>
-				<span>{$t('common.pkce_enforced')}</span>
-			<span class="foot-sep" aria-hidden="true"></span>
-			<span class="frost-tech"><span class="frost-spin" aria-hidden="true">❄</span> Frost Tech</span>
+				<span class="frost-tech"><span class="frost-spin" aria-hidden="true">❄</span> Powered by Frost Tech</span>
 			</footer>
 		</div>
 	</main>
@@ -167,6 +162,7 @@
 	.switch-link a { color: var(--accent); margin-left: 0.25rem; border-bottom: 1px solid transparent; transition: color 0.15s, border-color 0.15s; padding-bottom: 1px; }
 	.switch-link a:hover { color: var(--accent-hi); border-color: var(--accent-hi); }
 
-	.foot { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.6rem; font-family: var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); opacity: 0.55; }
+	.foot { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.65rem; font-family: var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); opacity: 0.55; }
+	.foot .frost-spin { font-size: 0.886rem; line-height: 1; vertical-align: middle; }
 	.foot-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--text-dim); opacity: 0.35; }
 </style>

@@ -187,7 +187,7 @@
       "badge": "Powered by Frost ID unified identity",
       "cta_explore": "Explore Ecosystem",
       "cta_login": "Sign in with Frost ID",
-      "core_label": "Frost ID"
+      "core_label": "Frost Tech"
     },
     "ecosystem": {
       "eyebrow": "Product Ecosystem",
@@ -222,8 +222,8 @@
     },
     "frostid": {
       "eyebrow": "Frost ID",
-      "title": "One account. The whole ecosystem.",
-      "desc": "OAuth 2.1-based unified sign-in and authorization across the entire ecosystem. Review and revoke any app's access to your account at any time.",
+      "title": "One sign-in. The whole Frost Tech ecosystem.",
+      "desc": "Unified sign-in across the ecosystem. Manage app access anytime.",
       "cta_login": "Sign In",
       "cta_authz": "Manage Access"
     },

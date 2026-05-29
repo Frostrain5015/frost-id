@@ -187,11 +187,11 @@
       "badge": "由 Frost ID 统一身份驱动",
       "cta_explore": "浏览生态",
       "cta_login": "登录 Frost ID",
-      "core_label": "Frost ID"
+      "core_label": "Frost Tech"
     },
     "ecosystem": {
       "eyebrow": "产品生态",
-      "title": "寒霜科技旗下产品",
+      "title": "Frost Tech旗下产品",
       "owned": "自研产品",
       "partner": "战略合作伙伴",
       "visit": "访问",
@@ -222,8 +222,8 @@
     },
     "frostid": {
       "eyebrow": "Frost ID",
-      "title": "一个账号，连接整个生态",
-      "desc": "基于 OAuth 2.1 的统一登录与授权，贯穿整个生态。你可以随时查看并解除任意应用对账户的访问权限。",
+      "title": "一键畅行寒霜科技生态",
+      "desc": "统一登录授权，贯穿全生态。随时管理您的应用授权。",
       "cta_login": "登录",
       "cta_authz": "授权管理"
     },
