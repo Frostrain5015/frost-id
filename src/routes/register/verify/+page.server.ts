@@ -132,7 +132,8 @@ export const actions: Actions = {
 
 		try {
 			await sendVerificationEmail(pending.email, newCode);
-		} catch {
+		} catch (e) {
+			console.error('[Frost ID] sendVerificationEmail failed (resend):', e);
 			return fail(500, { errorKey: 'register.err_send_failed' });
 		}
 

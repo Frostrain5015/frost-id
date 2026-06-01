@@ -8,6 +8,7 @@
 	let { data, form }: { data: PageData; form: any } = $props();
 
 	const t = getContext<Readable<Translator>>('t');
+	const usernamePattern = '^[a-zA-Z0-9_]{2,32}$';
 
 	let username = $state(data.user.username);
 	let avatarUrl = $state(data.user.avatarUrl ?? '');
@@ -131,7 +132,7 @@
 					required
 					minlength="2"
 					maxlength="32"
-					pattern="^[a-zA-Z0-9_]{2,32}$"
+					pattern={usernamePattern}
 					bind:value={username}
 				/>
 				<button type="submit" class="btn btn--ghost">{$t('dashboard.account.username_save')}</button>

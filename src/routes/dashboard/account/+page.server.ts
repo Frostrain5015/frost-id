@@ -37,6 +37,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		},
 		sessions: allSessions.map((s) => ({
 			id: s.id,
+			region: s.region,
 			createdAt: s.createdAt,
 			expiresAt: s.expiresAt
 		}))

@@ -81,6 +81,8 @@ export const sessions = mysqlTable(
 	{
 		id: varchar('id', { length: 36 }).primaryKey(),
 		userId: varchar('user_id', { length: 36 }).notNull(),
+		ip: varchar('ip', { length: 45 }),
+		region: varchar('region', { length: 255 }),
 		expiresAt: timestamp('expires_at').notNull(),
 		createdAt: timestamp('created_at').notNull().defaultNow()
 	},

@@ -2,14 +2,18 @@ import { redirect, error, fail } from '@sveltejs/kit';
 import { responseToVanilla } from '@jmondi/oauth2-server/vanilla';
 import type { OAuthResponse } from '@jmondi/oauth2-server';
 import { authorizationServer } from '$lib/server/oauth/server.js';
-import { getPending, deletePending } from '$lib/server/oauth/pending.js';
+import { getPending, getPendingOAuthParams, deletePending } from '$lib/server/oauth/pending.js';
+import { destroySession } from '$lib/server/session.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	if (!locals.user) throw redirect(302, '/login');
-
 	const pid = url.searchParams.get('pid');
 	if (!pid) throw error(400, 'Missing pending authorization ID');
+
+	if (!locals.user) {
+		const oauthParams = getPendingOAuthParams(pid);
+		throw redirect(302, oauthParams ? `/login?oauth=${encodeURIComponent(oauthParams)}` : '/login');
+	}
 
 	const authRequest = getPending(pid);
 	if (!authRequest) throw error(400, 'Authorization request expired.');
@@ -49,6 +53,17 @@ export const actions: Actions = {
 			if (e && typeof e === 'object' && 'status' in e && (e as { status: number }).status < 400) throw e;
 			return fail(400, { errorKey: 'consent.err_generic' });
 		}
+	},
+
+	switchAccount: async ({ request, cookies }) => {
+		const data = await request.formData();
+		const pid = data.get('pid') as string;
+		const oauthParams = pid ? getPendingOAuthParams(pid) : null;
+
+		if (pid) deletePending(pid);
+		await destroySession(cookies);
+
+		throw redirect(302, oauthParams ? `/login?oauth=${encodeURIComponent(oauthParams)}` : '/login');
 	},
 
 	deny: async ({ request }) => {

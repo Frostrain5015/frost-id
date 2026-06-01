@@ -12,7 +12,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		if (oauthParams) throw redirect(302, `/oauth/authorize?${oauthParams}`);
 		throw redirect(302, locals.user.isAdmin ? '/admin' : '/dashboard');
 	}
-	return { oauthParams: url.searchParams.get('oauth') };
+	return {
+		oauthParams: url.searchParams.get('oauth'),
+		resetSuccess: url.searchParams.get('reset') === '1'
+	};
 };
 
 function getClientIP(request: Request): string | undefined {

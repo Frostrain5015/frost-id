@@ -62,6 +62,10 @@
 				<div class="err" role="alert" aria-live="assertive">
 					{$t(errorMsg)}
 				</div>
+			{:else if data.resetSuccess}
+				<div class="notice" role="status" aria-live="polite">
+					{$t('login.reset_success')}
+				</div>
 			{/if}
 
 			<form method="POST" novalidate use:enhance={handleEnhance}>
@@ -91,6 +95,12 @@
 						disabled={loading}
 						onfocus={() => (errorMsg = '')}
 					/>
+				</div>
+
+				<div class="form-meta">
+					<a href={data.oauthParams ? `/forgot-password?oauth=${encodeURIComponent(data.oauthParams)}` : '/forgot-password'}>
+						{$t('login.forgot_password')}
+					</a>
 				</div>
 
 				<button
@@ -142,14 +152,22 @@
 	.frost { color: var(--accent); }
 	.tagline { font-family: var(--font-body); font-size: 0.55rem; font-weight: 400; letter-spacing: 0.35em; text-transform: uppercase; color: var(--text-dim); opacity: 0.6; margin-top: 0.125rem; }
 
-	.err { padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); border-radius: var(--radius-md); font-size: 0.8125rem; color: #e88383; animation: fadeUp 0.25s ease; }
+	.err,
+	.notice { padding: 0.75rem 1rem; margin-bottom: 1.25rem; border-radius: var(--radius-md); font-size: 0.8125rem; animation: fadeUp 0.25s ease; }
+	.err { background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); color: #e88383; }
+	.notice { background: rgba(113,118,170,0.08); border: 1px solid rgba(113,118,170,0.22); color: var(--accent-hi); }
 
 	.field { margin-bottom: 1.25rem; }
 	.field label { display: block; margin-bottom: 0.45rem; font-family: var(--font-body); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
-	.field input { display: block; width: 100%; padding: 0.75rem 0.875rem; font-family: var(--font-body); font-size: 0.9375rem; color: var(--text); background: var(--input-bg); border: 1px solid var(--border-hi); border-radius: var(--radius-md); outline: none; -webkit-appearance: none; transition: border-color 0.15s, box-shadow 0.15s; }
+	.field input { display: block; width: 100%; padding: 0.75rem 0.875rem; font-family: var(--font-body); font-size: 0.9375rem; color: var(--text); background: var(--input-bg); border: 1px solid var(--border-hi); border-radius: var(--radius-md); outline: none; appearance: none; -webkit-appearance: none; transition: border-color 0.15s, box-shadow 0.15s; }
 	.field input::placeholder { color: var(--text-dim); opacity: 0.5; }
 	.field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
 	.field input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+	.form-meta { display: flex; justify-content: flex-end; margin-top: 0.75rem; font-size: 0.8125rem; }
+	.form-meta a { color: var(--text-dim); opacity: 0.72; border-bottom: 1px solid transparent; padding-bottom: 1px; transition: color 0.15s, opacity 0.15s, border-color 0.15s; }
+	.form-meta a:hover { color: var(--accent-hi); opacity: 1; border-color: var(--accent-hi); }
+	.form-meta a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 
 	.submit { display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; margin-top: 1.75rem; font-family: var(--font-display); font-size: 0.9375rem; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; background: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; outline: none; transition: filter 0.18s, transform 0.15s; }
 	.submit:hover:not(:disabled)          { filter: brightness(1.15); transform: translateY(-1px); }

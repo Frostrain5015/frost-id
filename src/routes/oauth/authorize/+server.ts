@@ -20,6 +20,6 @@ export const GET: RequestHandler = async ({ request, locals, url }) => {
 	}
 
 	authRequest.user = { id: locals.user.id };
-	const pendingId = storePending(authRequest);
+	const pendingId = storePending(authRequest, url.searchParams.toString());
 	throw redirect(302, `/consent?pid=${pendingId}`);
 };

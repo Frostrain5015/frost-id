@@ -90,7 +90,8 @@ export const actions: Actions = {
 
 		try {
 			await sendVerificationEmail(email, code);
-		} catch {
+		} catch (e) {
+			console.error('[Frost ID] sendVerificationEmail failed (register):', e);
 			return fail(500, { errorKey: 'register.err_send_failed' });
 		}
 

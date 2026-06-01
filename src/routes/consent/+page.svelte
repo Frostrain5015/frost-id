@@ -13,6 +13,7 @@
 
 	let approving = $state(false);
 	let denying   = $state(false);
+	let switching = $state(false);
 	let mounted   = $state(false);
 	let hoveredScope = $state<string | null>(null);
 
@@ -75,6 +76,19 @@
 				</svg>
 				<span>{$t('consent.signed_as')}&nbsp;<strong>{data.user.email}</strong></span>
 			</p>
+
+			<form method="POST" action="?/switchAccount"
+				use:enhance={() => {
+					switching = true;
+					return async ({ update }) => { await update(); switching = false; };
+				}}
+				class="switch-account-form"
+			>
+				<input type="hidden" name="pid" value={data.pid} />
+				<button type="submit" class="switch-account" disabled={approving || denying || switching}>
+					{switching ? $t('consent.switching_account') : $t('consent.switch_account')}
+				</button>
+			</form>
 
 			{#if form?.errorKey}
 				<div class="err" role="alert" aria-live="assertive">{$t(form.errorKey)}</div>
@@ -180,6 +194,26 @@
 	.signed-as { display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.8125rem; color: var(--text-dim); margin-bottom: 1.25rem; }
 	.signed-as strong { color: var(--text); font-weight: 400; }
 	.user-icon { opacity: 0.5; flex-shrink: 0; }
+
+	.switch-account-form { display: flex; justify-content: center; margin: -0.6rem 0 1.25rem; }
+	.switch-account {
+		min-height: 44px;
+		padding: 0 0.25rem;
+		background: transparent;
+		border: 0;
+		color: var(--text-dim);
+		font-family: var(--font-body);
+		font-size: 0.8125rem;
+		cursor: pointer;
+		opacity: 0.72;
+		text-decoration: underline;
+		text-decoration-color: transparent;
+		text-underline-offset: 4px;
+		transition: color 0.15s, opacity 0.15s, text-decoration-color 0.15s;
+	}
+	.switch-account:hover:not(:disabled) { color: var(--accent-hi); opacity: 1; text-decoration-color: currentColor; }
+	.switch-account:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+	.switch-account:disabled { cursor: not-allowed; opacity: 0.4; }
 
 	.err { padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); border-radius: var(--radius-md); font-size: 0.8125rem; color: #e88383; text-align: center; animation: fadeUp 0.25s ease; }
 
