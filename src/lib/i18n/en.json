@@ -198,7 +198,10 @@
 
       "delete_label": "Delete account",
       "delete_desc": "This permanently deletes your account, authorized applications, and all associated data. This cannot be undone.",
-      "delete_confirm": "Type your password to confirm",
+      "delete_send_code": "Send verification code",
+      "delete_code_placeholder": "6-digit code from email",
+      "delete_code_sent": "Verification code sent — check your inbox",
+      "delete_code_invalid": "Invalid or expired verification code",
       "delete_btn": "Delete my account",
       "delete_deleting": "Deleting…",
       "delete_wrong_password": "Incorrect password",

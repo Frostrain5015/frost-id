@@ -44,7 +44,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			email: user.email,
 			username: user.username,
 			avatarUrl: user.avatarUrl,
-			createdAt: user.createdAt
+			createdAt: user.createdAt,
+			hasPassword: !!user.passwordHash
 		},
 		sessions: allSessions.map((s) => ({
 			id: s.id,
@@ -239,15 +240,60 @@ export const actions: Actions = {
 		return { success: 'dashboard.account.sessions_revoked' };
 	},
 
+	requestDeleteCode: async ({ request, locals }) => {
+		const [user] = await db.select().from(users).where(eq(users.id, locals.user!.id)).limit(1);
+		const email = user.email;
+
+		await db
+			.update(verificationCodes)
+			.set({ used: true })
+			.where(and(eq(verificationCodes.email, email), eq(verificationCodes.used, false)));
+
+		const code = String(100000 + Math.floor(Math.random() * 900000));
+		const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+		await db.insert(verificationCodes).values({
+			id: nanoid(36),
+			email,
+			code,
+			expiresAt,
+			used: false
+		});
+
+		try {
+			await sendVerificationEmail(email, code);
+		} catch {
+			return fail(500, { errorKey: 'register.err_send_failed' });
+		}
+
+		return { success: 'dashboard.account.delete_code_sent', deleteCodeSent: true };
+	},
+
 	deleteAccount: async ({ request, locals, cookies }) => {
 		const data = await request.formData();
-		const password = data.get('password') as string;
-
+		const code = (data.get('code') as string)?.trim();
 		const [user] = await db.select().from(users).where(eq(users.id, locals.user!.id)).limit(1);
-		const ok = await bcrypt.compare(password, user.passwordHash);
-		if (!ok) {
-			return fail(400, { errorKey: 'dashboard.account.delete_wrong_password' });
+
+		if (!code) {
+			return fail(400, { errorKey: 'dashboard.account.delete_code_invalid' });
 		}
+
+		const [vc] = await db
+			.select()
+			.from(verificationCodes)
+			.where(
+				and(
+					eq(verificationCodes.email, user.email),
+					eq(verificationCodes.code, code),
+					eq(verificationCodes.used, false)
+				)
+			)
+			.limit(1);
+
+		if (!vc || vc.expiresAt < new Date()) {
+			return fail(400, { errorKey: 'dashboard.account.delete_code_invalid' });
+		}
+
+		await db.update(verificationCodes).set({ used: true }).where(eq(verificationCodes.id, vc.id));
 
 		const userId = locals.user!.id;
 

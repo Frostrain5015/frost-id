@@ -20,7 +20,13 @@
 	let emailPending = $state('');
 	let emailCode = $state('');
 
-	let deletePassword = $state('');
+	let deleteCode = $state('');
+	let deleteCodeSent = $state(false);
+
+	let changePasswordOpen = $state(false);
+	let cpCurrent = $state('');
+	let cpNew = $state('');
+	let cpConfirm = $state('');
 
 	let toast = $state<{ key: string; kind: 'success' | 'error' } | null>(null);
 
@@ -41,6 +47,10 @@
 			if (form.emailChangePending) {
 				emailPending = form.emailChangePending as string;
 				toast = { key: 'dashboard.account.email_code_sent', kind: 'success' };
+			}
+			if (form.deleteCodeSent) {
+				deleteCodeSent = true;
+				toast = { key: 'dashboard.account.delete_code_sent', kind: 'success' };
 			}
 			setTimeout(() => { toast = null; }, 4000);
 		}
@@ -75,6 +85,64 @@
 		} finally {
 			avatarUploading = false;
 			input.value = '';
+		}
+	}
+
+	async function handleChangePassword() {
+		if (!cpNew || cpNew.length < 8) {
+			toast = { key: 'dashboard.account.password_short', kind: 'error' };
+			setTimeout(() => { toast = null; }, 5000);
+			return;
+		}
+		if (cpNew !== cpConfirm) {
+			toast = { key: 'dashboard.account.password_mismatch', kind: 'error' };
+			setTimeout(() => { toast = null; }, 5000);
+			return;
+		}
+
+		const fd = new FormData();
+		if (data.user.hasPassword) {
+			if (!cpCurrent) {
+				toast = { key: 'register.err_required', kind: 'error' };
+				setTimeout(() => { toast = null; }, 5000);
+				return;
+			}
+			fd.append('currentPassword', cpCurrent);
+		}
+		fd.append('newPassword', cpNew);
+		fd.append('confirmPassword', cpConfirm);
+
+		const res = await fetch('?/changePassword', { method: 'POST', body: fd });
+		if (res.redirected) {
+			window.location.href = res.url;
+			return;
+		}
+		const result = await res.json();
+		if (result.type === 'success') {
+			changePasswordOpen = false;
+			toast = { key: 'dashboard.account.password_changed', kind: 'success' };
+			setTimeout(() => { toast = null; }, 4000);
+		} else if (result.type === 'failure' && result.data?.errorKey) {
+			toast = { key: result.data.errorKey, kind: 'error' };
+			setTimeout(() => { toast = null; }, 5000);
+		}
+	}
+
+	async function handleRequestDeleteCode() {
+		const fd = new FormData();
+		const res = await fetch('?/requestDeleteCode', { method: 'POST', body: fd });
+		if (res.redirected) {
+			window.location.href = res.url;
+			return;
+		}
+		const result = await res.json();
+		if (result.type === 'success') {
+			deleteCodeSent = true;
+			toast = { key: 'dashboard.account.delete_code_sent', kind: 'success' };
+			setTimeout(() => { toast = null; }, 4000);
+		} else if (result.type === 'failure' && result.data?.errorKey) {
+			toast = { key: result.data.errorKey, kind: 'error' };
+			setTimeout(() => { toast = null; }, 5000);
 		}
 	}
 </script>
@@ -151,23 +219,15 @@
 	<section class="card" style="--anim-delay: 0.06s">
 		<h3 class="card-heading">{$t('dashboard.account.security_section')}</h3>
 
-		<form method="POST" action="?/changePassword" use:enhance>
-			<div class="field-group">
-				<label class="field" for="currentPassword">{$t('dashboard.account.password_current')}</label>
-				<input id="currentPassword" name="currentPassword" type="password" class="input" autocomplete="current-password" required />
+		<div class="field-group">
+			<label class="field">{$t('dashboard.account.password_current')}</label>
+			<div class="field-row">
+				<span class="field-value">••••••••</span>
+				<button type="button" class="btn btn--ghost" onclick={() => { changePasswordOpen = true; cpCurrent = ''; cpNew = ''; cpConfirm = ''; }}>
+					{$t('dashboard.account.password_save')}
+				</button>
 			</div>
-			<div class="field-row field-row--2">
-				<div class="field-group">
-					<label class="field" for="newPassword">{$t('dashboard.account.password_new')}</label>
-					<input id="newPassword" name="newPassword" type="password" class="input" autocomplete="new-password" required minlength="8" />
-				</div>
-				<div class="field-group">
-					<label class="field" for="confirmPassword">{$t('dashboard.account.password_confirm')}</label>
-					<input id="confirmPassword" name="confirmPassword" type="password" class="input" autocomplete="new-password" required minlength="8" />
-				</div>
-			</div>
-			<button type="submit" class="btn btn--primary mt">{$t('dashboard.account.password_save')}</button>
-		</form>
+		</div>
 
 		<hr class="sep" />
 
@@ -221,19 +281,18 @@
 		{/if}
 	</section>
 
-	
-				<!-- ═══════ Linked Accounts ═══════ -->
-		<section class="card" style="--anim-delay: 0.08s">
-			<h3 class="card-heading">{$t('dashboard.account.linked_section')}</h3>
-			<p class="section-desc">{$t('dashboard.account.linked_desc')}</p>
+	<!-- ═══════ Linked Accounts ═══════ -->
+	<section class="card" style="--anim-delay: 0.08s">
+		<h3 class="card-heading">{$t('dashboard.account.linked_section')}</h3>
+		<p class="section-desc">{$t('dashboard.account.linked_desc')}</p>
 
-			<div class="linked-list">
-				{#each [{ provider: 'github', label: 'Github' }, { provider: 'google', label: 'Google' }] as prov}
-					{@const linked = data.linkedAccounts.find((a: any) => a.provider === prov.provider)}
-					<div class="linked-row">
-						<div class="linked-info">
-							{#if prov.provider === 'github'}
-								<svg class="linked-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.675 1.14 1.785 1.38 2.64 1.065.075-.54.27-.93.495-1.14-1.725-.195-3.51-.87-3.51-3.87 0-.87.3-1.59.795-2.145-.075-.195-.345-1.02.075-2.13 0 0 .645-.21 2.13.795.63-.18 1.29-.27 1.95-.27s1.32.09 1.95.27c1.485-1.02 2.13-.795 2.13-.795.42 1.11.15 1.935.075 2.13.495.555.795 1.275.795 2.145 0 3.015-1.8 3.675-3.525 3.87.285.24.54.705.54 1.41 0 1.02-.015 1.845-.015 2.1 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+		<div class="linked-list">
+			{#each [{ provider: 'github', label: 'Github' }, { provider: 'google', label: 'Google' }] as prov}
+				{@const linked = data.linkedAccounts.find((a: any) => a.provider === prov.provider)}
+				<div class="linked-row">
+					<div class="linked-info">
+						{#if prov.provider === 'github'}
+							<svg class="linked-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.675 1.14 1.785 1.38 2.64 1.065.075-.54.27-.93.495-1.14-1.725-.195-3.51-.87-3.51-3.87 0-.87.3-1.59.795-2.145-.075-.195-.345-1.02.075-2.13 0 0 .645-.21 2.13.795.63-.18 1.29-.27 1.95-.27s1.32.09 1.95.27c1.485-1.02 2.13-.795 2.13-.795.42 1.11.15 1.935.075 2.13.495.555.795 1.275.795 2.145 0 3.015-1.8 3.675-3.525 3.87.285.24.54.705.54 1.41 0 1.02-.015 1.845-.015 2.1 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
 						{:else}
 							<svg class="linked-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
 						{/if}
@@ -260,18 +319,32 @@
 							>{$t('dashboard.account.link_unlink')}</button>
 						</form>
 					{:else}
-						<button
-							type="button"
-							class="btn btn--ghost"
-							onclick={() => { window.location.href = `/auth/${prov.provider}?action=link`; }}
-						>{$t('dashboard.account.link_connect')}</button>
+						<a
+							data-sveltekit-reload
+							href={`/auth/${prov.provider}?action=link`}
+							class="social-btn"
+						>
+							{#if prov.provider === 'github'}
+								<svg class="social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+									<path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.675 1.14 1.785 1.38 2.64 1.065.075-.54.27-.93.495-1.14-1.725-.195-3.51-.87-3.51-3.87 0-.87.3-1.59.795-2.145-.075-.195-.345-1.02.075-2.13 0 0 .645-.21 2.13.795.63-.18 1.29-.27 1.95-.27s1.32.09 1.95.27c1.485-1.02 2.13-.795 2.13-.795.42 1.11.15 1.935.075 2.13.495.555.795 1.275.795 2.145 0 3.015-1.8 3.675-3.525 3.87.285.24.54.705.54 1.41 0 1.02-.015 1.845-.015 2.1 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+								</svg>
+							{:else}
+								<svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+									<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+									<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+									<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+									<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+								</svg>
+							{/if}
+							<span>{prov.provider === 'github' ? $t('login.continue_github') : $t('login.continue_google')}</span>
+						</a>
 					{/if}
 				</div>
 			{/each}
-			</div>
-		</section>
+		</div>
+	</section>
 
-		<!-- ═══════ Sessions ═══════ -->
+	<!-- ═══════ Sessions ═══════ -->
 	<section class="card" style="--anim-delay: 0.1s">
 		<h3 class="card-heading">{$t('dashboard.account.sessions_section')}</h3>
 
@@ -305,32 +378,80 @@
 
 		<p class="danger-desc">{$t('dashboard.account.delete_desc')}</p>
 
-		<form method="POST" action="?/deleteAccount" use:enhance>
-			<div class="field-row">
-				<input
-					id="deletePassword"
-					name="password"
-					type="password"
-					class="input input--danger"
-					required
-					placeholder={$t('dashboard.account.delete_confirm')}
-					bind:value={deletePassword}
-				/>
-				<button
-					type="submit"
-					class="btn btn--danger"
-					onclick={(e) => confirmSubmit(e, {
-						title: $t('dashboard.account.delete_label'),
-						message: $t('dashboard.account.delete_desc'),
-						confirmLabel: $t('dashboard.account.delete_btn'),
-						cancelLabel: $t('common.cancel'),
-						variant: 'danger'
-					})}
-				>{$t('dashboard.account.delete_btn')}</button>
-			</div>
-		</form>
+		{#if !deleteCodeSent}
+			<button
+				type="button"
+				class="btn btn--danger"
+				onclick={handleRequestDeleteCode}
+			>{$t('dashboard.account.delete_send_code')}</button>
+		{:else}
+			<form method="POST" action="?/deleteAccount" use:enhance>
+				<div class="field-row">
+					<input
+						id="deleteCode"
+						name="code"
+						type="text"
+						class="input input--danger"
+						required
+						placeholder={$t('dashboard.account.delete_code_placeholder')}
+						bind:value={deleteCode}
+					/>
+					<button
+						type="submit"
+						class="btn btn--danger"
+						onclick={(e) => confirmSubmit(e, {
+							title: $t('dashboard.account.delete_label'),
+							message: $t('dashboard.account.delete_desc'),
+							confirmLabel: $t('dashboard.account.delete_btn'),
+							cancelLabel: $t('common.cancel'),
+							variant: 'danger'
+						})}
+					>{$t('dashboard.account.delete_btn')}</button>
+				</div>
+			</form>
+		{/if}
 	</section>
 </div>
+
+<!-- ═══════ Change Password Modal ═══════ -->
+{#if changePasswordOpen}
+	<div
+		class="modal-layer"
+		role="presentation"
+		onclick={(event) => {
+			if (event.target === event.currentTarget) changePasswordOpen = false;
+		}}
+	>
+		<div class="modal-card" role="dialog" aria-modal="true">
+			<div class="confirm-mark" aria-hidden="true"></div>
+			<h2 class="modal-title">{$t('dashboard.account.password_save')}</h2>
+
+			{#if data.user.hasPassword}
+				<div class="field-group">
+					<label class="field" for="cpCurrent">{$t('dashboard.account.password_current')}</label>
+					<input id="cpCurrent" type="password" class="input" autocomplete="current-password" bind:value={cpCurrent} />
+				</div>
+			{/if}
+			<div class="field-group">
+				<label class="field" for="cpNew">{$t('dashboard.account.password_new')}</label>
+				<input id="cpNew" type="password" class="input" autocomplete="new-password" minlength="8" bind:value={cpNew} />
+			</div>
+			<div class="field-group">
+				<label class="field" for="cpConfirm">{$t('dashboard.account.password_confirm')}</label>
+				<input id="cpConfirm" type="password" class="input" autocomplete="new-password" minlength="8" bind:value={cpConfirm} />
+			</div>
+
+			<div class="modal-actions">
+				<button type="button" class="btn btn--ghost" onclick={() => (changePasswordOpen = false)}>
+					{$t('common.cancel')}
+				</button>
+				<button type="button" class="btn btn--primary" onclick={handleChangePassword}>
+					{$t('dashboard.account.password_save')}
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.page { max-width: 640px; }
@@ -388,7 +509,14 @@
 		gap: 0.5rem;
 		align-items: flex-end;
 	}
-	.field-row--2 { gap: 0.75rem; }
+
+	.field-value {
+		flex: 1;
+		font-family: var(--font-body);
+		font-size: 0.8125rem;
+		color: var(--text-dim);
+		letter-spacing: 0.08em;
+	}
 
 	/* ── Avatar ─────────────────────────────────────────── */
 	.avatar-row {
@@ -565,61 +693,95 @@
 		border-top: 1px solid var(--border);
 	}
 
-	
-		/* ── Linked Accounts ─────────────────────────────────── */
-		.section-desc {
-			font-family: var(--font-body);
-			font-size: 0.75rem;
-			color: var(--text-dim);
-			line-height: 1.6;
-			margin-bottom: 1rem;
-		}
-		.linked-list {
-			display: flex;
-			flex-direction: column;
-			gap: 0.5rem;
-		}
-		.linked-row {
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-			padding: 0.75rem 0.875rem;
-			background: var(--bg);
-			border: 1px solid var(--border);
-			border-radius: var(--radius-sm);
-		}
-		.linked-info {
-			flex: 1;
-			min-width: 0;
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-		}
-		.linked-logo {
-			width: 24px;
-			height: 24px;
-			flex-shrink: 0;
-			object-fit: contain;
-		}
-		.linked-detail {
-			display: flex;
-			flex-direction: column;
-			gap: 2px;
-		}
-		.linked-provider {
-			font-family: var(--font-body);
-			font-size: 0.8125rem;
-			font-weight: 500;
-			color: var(--text);
-		}
-		.linked-name {
-			font-family: var(--font-body);
-			font-size: 0.7rem;
-			color: var(--text-dim);
-			opacity: 0.7;
-		}
+	/* ── Social Buttons (from login page) ──────────────── */
+	.social-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.625rem;
+		width: 100%;
+		height: 44px;
+		font-family: var(--font-display);
+		font-size: 0.8125rem;
+		font-weight: 400;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text);
+		background: var(--input-bg);
+		border: 1px solid var(--border-hi);
+		border-radius: var(--radius-md);
+		cursor: pointer;
+		text-decoration: none;
+		transition: border-color 0.15s, background 0.15s, color 0.15s;
+	}
+	.social-btn:hover {
+		border-color: rgba(255,255,255,0.18);
+		background: rgba(255,255,255,0.04);
+	}
+	.social-btn:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+	.social-icon {
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+	}
 
-		/* ── Sessions ───────────────────────────────────────── */
+	/* ── Linked Accounts ─────────────────────────────────── */
+	.section-desc {
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		color: var(--text-dim);
+		line-height: 1.6;
+		margin-bottom: 1rem;
+	}
+	.linked-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.linked-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 0.875rem;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+	}
+	.linked-info {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.linked-logo {
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+		object-fit: contain;
+	}
+	.linked-detail {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.linked-provider {
+		font-family: var(--font-body);
+		font-size: 0.8125rem;
+		font-weight: 500;
+		color: var(--text);
+	}
+	.linked-name {
+		font-family: var(--font-body);
+		font-size: 0.7rem;
+		color: var(--text-dim);
+		opacity: 0.7;
+	}
+
+	/* ── Sessions ───────────────────────────────────────── */
 	.session-list {
 		display: flex;
 		flex-direction: column;
@@ -676,5 +838,86 @@
 		color: var(--text-dim);
 		line-height: 1.6;
 		margin-bottom: 1rem;
+	}
+
+	/* ── Modal ───────────────────────────────────────────── */
+	.modal-layer {
+		position: fixed;
+		inset: 0;
+		z-index: 200;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1.25rem;
+		background: rgba(4,5,8,0.72);
+		backdrop-filter: blur(14px);
+		animation: confirmLayerIn 0.18s ease both;
+	}
+
+	.modal-card {
+		position: relative;
+		width: min(100%, 430px);
+		padding: 1.25rem;
+		border: 1px solid rgba(113,118,170,0.28);
+		border-radius: var(--radius-lg);
+		background:
+			linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)),
+			var(--surface);
+		box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+		outline: none;
+		animation: confirmCardIn 0.22s cubic-bezier(0.22,1,0.36,1) both;
+	}
+
+	.confirm-mark {
+		width: 2rem;
+		height: 2rem;
+		margin-bottom: 1rem;
+		border: 1px solid rgba(113,118,170,0.32);
+		border-radius: 999px;
+		background: radial-gradient(circle at center, var(--accent-hi) 0 23%, rgba(113,118,170,0.16) 24% 100%);
+		box-shadow: 0 0 0 6px rgba(113,118,170,0.08);
+	}
+
+	.modal-title {
+		margin: 0 0 1rem;
+		font-family: var(--font-display);
+		font-size: 1.1rem;
+		font-weight: 400;
+		letter-spacing: 0.03em;
+		color: var(--text);
+		line-height: 1.25;
+	}
+
+	.modal-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.625rem;
+		margin-top: 1.25rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--border);
+	}
+
+	@keyframes confirmLayerIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	@keyframes confirmCardIn {
+		from { opacity: 0; transform: translateY(10px) scale(0.985); }
+		to { opacity: 1; transform: translateY(0) scale(1); }
+	}
+
+	@media (max-width: 520px) {
+		.modal-layer { align-items: flex-end; padding: 0.75rem; }
+		.modal-card { width: 100%; }
+		.modal-actions { flex-direction: column-reverse; }
+		.modal-actions .btn { width: 100%; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.modal-layer,
+		.modal-card {
+			animation: none;
+		}
 	}
 </style>

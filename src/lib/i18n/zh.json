@@ -198,7 +198,10 @@
 
       "delete_label": "注销账户",
       "delete_desc": "此操作将永久删除您的账户、已授权应用及所有关联数据，不可撤销。",
-      "delete_confirm": "输入密码以确认",
+      "delete_send_code": "发送验证码",
+      "delete_code_placeholder": "邮箱收到的6位验证码",
+      "delete_code_sent": "验证码已发送 — 请查看邮箱",
+      "delete_code_invalid": "验证码无效或已过期",
       "delete_btn": "注销我的账户",
       "delete_deleting": "注销中…",
       "delete_wrong_password": "密码错误",
