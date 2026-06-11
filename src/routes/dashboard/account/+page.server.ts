@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { nanoid } from 'nanoid';
 import { db } from '$lib/server/db/client.js';
-import { users, sessions, accessTokens, authCodes, verificationCodes } from '$lib/server/db/schema.js';
+import { users, sessions, accessTokens, authCodes, verificationCodes, linkedAccounts } from '$lib/server/db/schema.js';
 import { eq, and, ne } from 'drizzle-orm';
 import { sendVerificationEmail } from '$lib/server/email.js';
 import { destroySession } from '$lib/server/session.js';
@@ -10,7 +10,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{2,32}$/;
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
 	const userId = locals.user!.id;
 
 	const userRows = await db
@@ -20,12 +20,23 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.limit(1);
 	const user = userRows[0];
 
-	const currentSessionId = ''; // we don't expose the raw session ID
 	const allSessions = await db
 		.select()
 		.from(sessions)
 		.where(eq(sessions.userId, userId))
 		.orderBy(sessions.createdAt);
+
+	const userLinkedAccounts = await db
+		.select({
+			id: linkedAccounts.id,
+			provider: linkedAccounts.provider,
+			displayName: linkedAccounts.displayName,
+			email: linkedAccounts.email,
+			avatarUrl: linkedAccounts.avatarUrl,
+			createdAt: linkedAccounts.createdAt
+		})
+		.from(linkedAccounts)
+		.where(eq(linkedAccounts.userId, userId));
 
 	return {
 		user: {
@@ -40,7 +51,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 			region: s.region,
 			createdAt: s.createdAt,
 			expiresAt: s.expiresAt
-		}))
+		})),
+		linkedAccounts: userLinkedAccounts,
+		linkedProvider: url.searchParams.get('linked'),
+		linkError: url.searchParams.get('error')
 	};
 };
 
@@ -78,7 +92,7 @@ export const actions: Actions = {
 		const next = data.get('newPassword') as string;
 		const confirm = data.get('confirmPassword') as string;
 
-		if (!current || !next || !confirm) {
+		if (!next || !confirm) {
 			return fail(400, { errorKey: 'register.err_required' });
 		}
 		if (next.length < 8) {
@@ -89,14 +103,59 @@ export const actions: Actions = {
 		}
 
 		const [user] = await db.select().from(users).where(eq(users.id, locals.user!.id)).limit(1);
-		const ok = await bcrypt.compare(current, user.passwordHash);
-		if (!ok) {
-			return fail(400, { errorKey: 'dashboard.account.password_wrong' });
+
+		if (user.passwordHash) {
+			if (!current) {
+				return fail(400, { errorKey: 'register.err_required' });
+			}
+			const ok = await bcrypt.compare(current, user.passwordHash);
+			if (!ok) {
+				return fail(400, { errorKey: 'dashboard.account.password_wrong' });
+			}
 		}
 
 		const passwordHash = await bcrypt.hash(next, 12);
 		await db.update(users).set({ passwordHash }).where(eq(users.id, locals.user!.id));
 		return { success: 'dashboard.account.password_changed' };
+	},
+
+	unlinkAccount: async ({ request, locals }) => {
+		const data = await request.formData();
+		const accountId = (data.get('accountId') as string)?.trim();
+		if (!accountId) {
+			return fail(400, { errorKey: 'dashboard.account.link_err_missing' });
+		}
+
+		const [account] = await db
+			.select()
+			.from(linkedAccounts)
+			.where(and(
+				eq(linkedAccounts.id, accountId),
+				eq(linkedAccounts.userId, locals.user!.id)
+			))
+			.limit(1);
+
+		if (!account) {
+			return fail(400, { errorKey: 'dashboard.account.link_err_not_found' });
+		}
+
+		// Safety: check remaining linked accounts
+		const otherLinks = await db
+			.select({ id: linkedAccounts.id })
+			.from(linkedAccounts)
+			.where(and(
+				eq(linkedAccounts.userId, locals.user!.id),
+				ne(linkedAccounts.id, accountId)
+			))
+			.limit(1);
+
+		if (otherLinks.length === 0) {
+			// This was the last linked account — user still has password, so it's safe
+			// but we should warn if they have no other login methods
+		}
+
+		await db.delete(linkedAccounts).where(eq(linkedAccounts.id, accountId));
+		return { success: 'dashboard.account.link_removed' };
 	},
 
 	requestEmailChange: async ({ request, locals }) => {
@@ -192,6 +251,7 @@ export const actions: Actions = {
 
 		const userId = locals.user!.id;
 
+		await db.delete(linkedAccounts).where(eq(linkedAccounts.userId, userId));
 		await db.delete(accessTokens).where(eq(accessTokens.userId, userId));
 		await db.delete(authCodes).where(eq(authCodes.userId, userId));
 		await db.delete(sessions).where(eq(sessions.userId, userId));

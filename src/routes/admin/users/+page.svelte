@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { getContext } from 'svelte';
+	import { confirmSubmit } from '$lib/client/confirm-submit.js';
+	import SystemNotice from '$lib/components/SystemNotice.svelte';
 	import type { Readable } from 'svelte/store';
 	import type { ActionData, PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
@@ -38,15 +40,11 @@
 </div>
 
 {#if form?.created}
-	<div class="notice-panel anim-item" role="status" aria-live="polite">
-		<span aria-hidden="true">✦</span> {$t('users.notice_created')}
-	</div>
+	<SystemNotice variant="success">{$t('users.notice_created')}</SystemNotice>
 {/if}
 
 {#if form?.errorKey}
-	<div class="err-panel anim-item" role="alert" aria-live="assertive">
-		<span aria-hidden="true">◆</span> {$t(form.errorKey)}
-	</div>
+	<SystemNotice variant="error">{$t(form.errorKey)}</SystemNotice>
 {/if}
 
 {#if showCreate}
@@ -141,11 +139,13 @@
 									type="submit"
 									class="btn-ghost del-btn"
 									aria-label={$t('users.delete_aria', { name: user.username })}
-									onclick={(e) => {
-										if (!confirm($t('users.delete_confirm', { email: user.email }))) {
-											e.preventDefault();
-										}
-									}}
+									onclick={(e) => confirmSubmit(e, {
+										title: $t('users.delete_aria', { name: user.username }),
+										message: $t('users.delete_confirm', { email: user.email }),
+										confirmLabel: $t('users.delete_aria', { name: user.username }),
+										cancelLabel: $t('common.cancel'),
+										variant: 'danger'
+									})}
 								>✕</button>
 							</form>
 						</td>
@@ -170,8 +170,6 @@
 	.page-title { font-family: var(--font-display); font-size: 2rem; font-weight: 300; color: var(--text); letter-spacing: 0.02em; }
 	.page-sub { font-size: 0.8125rem; color: var(--text-dim); margin-top: 0.25rem; }
 	.new-btn { width: auto; cursor: pointer; padding: 0.75rem 1.25rem; }
-	.notice-panel { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(113,118,170,0.08); border: 1px solid rgba(113,118,170,0.28); border-radius: var(--radius-md); font-size: 0.8125rem; color: var(--accent-hi); }
-	.err-panel { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(217,92,92,0.08); border: 1px solid rgba(217,92,92,0.28); border-radius: var(--radius-md); font-size: 0.8125rem; color: #e88383; }
 	.create-panel { margin-bottom: 1.5rem; }
 	.create-inner { padding: 1.75rem 2rem; }
 	.create-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 300; color: var(--text); margin-bottom: 1.5rem; letter-spacing: 0.04em; }

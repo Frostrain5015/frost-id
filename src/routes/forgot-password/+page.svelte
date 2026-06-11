@@ -5,6 +5,7 @@
 	import type { ActionData, PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
 	import LangToggle from '$lib/components/LangToggle.svelte';
+	import SystemNotice from '$lib/components/SystemNotice.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -98,9 +99,9 @@
 			<p class="subtext">{$t(codeSent ? 'forgot.reset_subtitle' : 'forgot.subtitle')}</p>
 
 			{#if errorMsg}
-				<div class="err" role="alert" aria-live="assertive">{$t(errorMsg)}</div>
+				<SystemNotice variant="error">{$t(errorMsg)}</SystemNotice>
 			{:else if form?.codeSent}
-				<div class="notice" role="status" aria-live="polite">{$t('forgot.code_sent')}</div>
+				<SystemNotice variant="info">{$t('forgot.code_sent')}</SystemNotice>
 			{/if}
 
 			<form method="POST" action="?/requestCode" novalidate use:enhance={requestEnhance}>
@@ -243,10 +244,6 @@
 
 	.heading { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; letter-spacing: 0; line-height: 1.2; color: var(--text); text-align: center; margin-bottom: 0.5rem; }
 	.subtext { max-width: 320px; margin: 0 auto 1.4rem; font-size: 0.8125rem; line-height: 1.6; color: var(--text-dim); text-align: center; }
-
-	.err, .notice { padding: 0.75rem 1rem; margin-bottom: 1.25rem; border-radius: var(--radius-md); font-size: 0.8125rem; animation: fadeUp 0.25s ease; }
-	.err { background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); color: #e88383; }
-	.notice { background: rgba(113,118,170,0.08); border: 1px solid rgba(113,118,170,0.22); color: var(--accent-hi); }
 
 	.field { margin-bottom: 1.125rem; }
 	.field label { display: block; margin-bottom: 0.4rem; font-family: var(--font-body); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }

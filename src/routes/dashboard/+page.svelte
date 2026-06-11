@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { getContext } from 'svelte';
+	import { confirmSubmit } from '$lib/client/confirm-submit.js';
 	import type { Readable } from 'svelte/store';
 	import type { PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
@@ -76,11 +77,13 @@
 							<button
 								type="submit"
 								class="revoke-btn"
-								onclick={(e) => {
-									if (!confirm($t('dashboard.revoke_confirm', { name: client.name }))) {
-										e.preventDefault();
-									}
-								}}
+								onclick={(e) => confirmSubmit(e, {
+									title: $t('dashboard.revoke'),
+									message: $t('dashboard.revoke_confirm', { name: client.name }),
+									confirmLabel: $t('dashboard.revoke'),
+									cancelLabel: $t('common.cancel'),
+									variant: 'danger'
+								})}
 							>{$t('dashboard.revoke')}</button>
 						</form>
 					</div>

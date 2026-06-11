@@ -32,7 +32,12 @@
     "forgot_password": "Forgot password?",
     "reset_success": "Password updated. Sign in with your new password.",
     "err_credentials": "Invalid email or password.",
-    "err_required": "Email and password are required."
+    "err_required": "Email and password are required.",
+    "or_continue_with": "or continue with",
+    "continue_github": "Continue with Github",
+    "continue_google": "Continue with Google",
+    "err_social_failed": "Social login failed. Please try again.",
+    "err_social_no_email": "This account has no email. Please sign up with email and password first."
   },
   "forgot": {
     "page_title": "Reset Password — Frost ID",
@@ -88,7 +93,8 @@
     "verify_resent": "Code resent!",
     "verify_back": "Back",
     "err_code_invalid": "Invalid or expired code. Please try again.",
-    "err_expired": "Registration session expired. Please start over."
+    "err_expired": "Registration session expired. Please start over.",
+    "social_hint": "Signing up with a social account creates a Frost ID linked to that provider."
   },
   "consent": {
     "page_title": "Authorize — Frost ID",
@@ -195,7 +201,20 @@
       "delete_confirm": "Type your password to confirm",
       "delete_btn": "Delete my account",
       "delete_deleting": "Deleting…",
-      "delete_wrong_password": "Incorrect password"
+      "delete_wrong_password": "Incorrect password",
+
+      "linked_section": "Linked Accounts",
+      "linked_desc": "Connect your Frost ID to social accounts for easy sign-in.",
+      "link_connect": "Connect",
+      "link_connected": "Account linked successfully",
+      "link_unlink": "Unlink",
+      "link_unlink_confirm": "Unlink this account? You won't be able to sign in with it anymore.",
+      "link_removed": "Account unlinked",
+      "link_err_missing": "Account not specified",
+      "link_err_not_found": "Linked account not found",
+      "link_err_already_used": "This social account is already linked to another Frost ID.",
+      "link_err_already_linked": "This provider is already linked to your account.",
+      "link_err_unauthorized": "You are not authorized to link accounts."
     }
   },
   "home": {
@@ -339,5 +358,13 @@
     "empty_desc": "Add a user account to get started.",
     "err_fields": "All fields are required",
     "err_password": "Password must be at least 8 characters"
+  },
+  "social_complete": {
+    "page_title": "Complete Registration — Frost ID",
+    "expired": "This registration link has expired. Please start over.",
+    "back_to_login": "Back to sign in",
+    "setup_hint": "Set a password for your Frost ID to complete registration.",
+    "submit": "Create Account",
+    "creating": "Creating account…"
   }
 }

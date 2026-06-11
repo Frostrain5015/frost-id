@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { getContext } from 'svelte';
+	import { confirmSubmit } from '$lib/client/confirm-submit.js';
+	import SystemNotice from '$lib/components/SystemNotice.svelte';
 	import type { Readable } from 'svelte/store';
 	import type { PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
@@ -21,6 +23,17 @@
 	let deletePassword = $state('');
 
 	let toast = $state<{ key: string; kind: 'success' | 'error' } | null>(null);
+
+	$effect(() => {
+		if (data.linkedProvider) {
+			toast = { key: 'dashboard.account.link_connected', kind: 'success' };
+			setTimeout(() => { toast = null; }, 4000);
+		}
+		if (data.linkError) {
+			toast = { key: 'dashboard.account.link_err_' + data.linkError, kind: 'error' };
+			setTimeout(() => { toast = null; }, 5000);
+		}
+	});
 
 	$effect(() => {
 		if (form?.success) {
@@ -74,14 +87,7 @@
 	<h2 class="page-title">{$t('dashboard.account.heading')}</h2>
 
 	{#if toast}
-		<div
-			class="toast"
-			class:toast--error={toast.kind === 'error'}
-			class:toast--success={toast.kind === 'success'}
-			role="alert"
-		>
-			<span>{$t(toast.key)}</span>
-		</div>
+		<SystemNotice variant={toast.kind}>{$t(toast.key)}</SystemNotice>
 	{/if}
 
 	<!-- ═══════ Profile ═══════ -->
@@ -215,7 +221,57 @@
 		{/if}
 	</section>
 
-	<!-- ═══════ Sessions ═══════ -->
+	
+				<!-- ═══════ Linked Accounts ═══════ -->
+		<section class="card" style="--anim-delay: 0.08s">
+			<h3 class="card-heading">{$t('dashboard.account.linked_section')}</h3>
+			<p class="section-desc">{$t('dashboard.account.linked_desc')}</p>
+
+			<div class="linked-list">
+				{#each [{ provider: 'github', label: 'Github' }, { provider: 'google', label: 'Google' }] as prov}
+					{@const linked = data.linkedAccounts.find((a: any) => a.provider === prov.provider)}
+					<div class="linked-row">
+						<div class="linked-info">
+							{#if prov.provider === 'github'}
+								<svg class="linked-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.675 1.14 1.785 1.38 2.64 1.065.075-.54.27-.93.495-1.14-1.725-.195-3.51-.87-3.51-3.87 0-.87.3-1.59.795-2.145-.075-.195-.345-1.02.075-2.13 0 0 .645-.21 2.13.795.63-.18 1.29-.27 1.95-.27s1.32.09 1.95.27c1.485-1.02 2.13-.795 2.13-.795.42 1.11.15 1.935.075 2.13.495.555.795 1.275.795 2.145 0 3.015-1.8 3.675-3.525 3.87.285.24.54.705.54 1.41 0 1.02-.015 1.845-.015 2.1 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+						{:else}
+							<svg class="linked-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+						{/if}
+						<div class="linked-detail">
+							<span class="linked-provider">{prov.label}</span>
+							{#if linked}
+								<span class="linked-name">{linked.displayName ?? linked.email ?? ''}</span>
+							{/if}
+						</div>
+					</div>
+					{#if linked}
+						<form method="POST" action="?/unlinkAccount" use:enhance>
+							<input type="hidden" name="accountId" value={linked.id} />
+							<button
+								type="submit"
+								class="btn btn--danger-ghost"
+								onclick={(e) => confirmSubmit(e, {
+									title: $t('dashboard.account.link_unlink'),
+									message: $t('dashboard.account.link_unlink_confirm'),
+									confirmLabel: $t('dashboard.account.link_unlink'),
+									cancelLabel: $t('common.cancel'),
+									variant: 'danger'
+								})}
+							>{$t('dashboard.account.link_unlink')}</button>
+						</form>
+					{:else}
+						<button
+							type="button"
+							class="btn btn--ghost"
+							onclick={() => { window.location.href = `/auth/${prov.provider}?action=link`; }}
+						>{$t('dashboard.account.link_connect')}</button>
+					{/if}
+				</div>
+			{/each}
+			</div>
+		</section>
+
+		<!-- ═══════ Sessions ═══════ -->
 	<section class="card" style="--anim-delay: 0.1s">
 		<h3 class="card-heading">{$t('dashboard.account.sessions_section')}</h3>
 
@@ -263,11 +319,13 @@
 				<button
 					type="submit"
 					class="btn btn--danger"
-					onclick={(e) => {
-						if (!confirm($t('dashboard.account.delete_confirm'))) {
-							e.preventDefault();
-						}
-					}}
+					onclick={(e) => confirmSubmit(e, {
+						title: $t('dashboard.account.delete_label'),
+						message: $t('dashboard.account.delete_desc'),
+						confirmLabel: $t('dashboard.account.delete_btn'),
+						cancelLabel: $t('common.cancel'),
+						variant: 'danger'
+					})}
 				>{$t('dashboard.account.delete_btn')}</button>
 			</div>
 		</form>
@@ -287,19 +345,6 @@
 		letter-spacing: 0.02em;
 		margin-bottom: 1.75rem;
 	}
-
-	/* ── Toast ──────────────────────────────────────────── */
-	.toast {
-		padding: 0.625rem 1rem;
-		border-radius: var(--radius-sm);
-		font-family: var(--font-body);
-		font-size: 0.75rem;
-		letter-spacing: 0.03em;
-		margin-bottom: 1.25rem;
-		animation: fadeUp 0.3s ease;
-	}
-	.toast--success { background: rgba(94,186,125,0.1); border: 1px solid rgba(94,186,125,0.25); color: #7ecf92; }
-	.toast--error   { background: rgba(217,92,92,0.1); border: 1px solid rgba(217,92,92,0.25); color: #e08080; }
 
 	/* ── Cards ──────────────────────────────────────────── */
 	.card {
@@ -520,7 +565,61 @@
 		border-top: 1px solid var(--border);
 	}
 
-	/* ── Sessions ───────────────────────────────────────── */
+	
+		/* ── Linked Accounts ─────────────────────────────────── */
+		.section-desc {
+			font-family: var(--font-body);
+			font-size: 0.75rem;
+			color: var(--text-dim);
+			line-height: 1.6;
+			margin-bottom: 1rem;
+		}
+		.linked-list {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+		.linked-row {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			padding: 0.75rem 0.875rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-sm);
+		}
+		.linked-info {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+		.linked-logo {
+			width: 24px;
+			height: 24px;
+			flex-shrink: 0;
+			object-fit: contain;
+		}
+		.linked-detail {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+		.linked-provider {
+			font-family: var(--font-body);
+			font-size: 0.8125rem;
+			font-weight: 500;
+			color: var(--text);
+		}
+		.linked-name {
+			font-family: var(--font-body);
+			font-size: 0.7rem;
+			color: var(--text-dim);
+			opacity: 0.7;
+		}
+
+		/* ── Sessions ───────────────────────────────────────── */
 	.session-list {
 		display: flex;
 		flex-direction: column;

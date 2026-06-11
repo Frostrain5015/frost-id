@@ -119,8 +119,67 @@ export const pendingRegistrations = mysqlTable(
 	(t) => ({ emailIdx: index('pr_email_idx').on(t.email) })
 );
 
+export const linkedAccounts = mysqlTable(
+	'linked_accounts',
+	{
+		id: varchar('id', { length: 36 }).primaryKey(),
+		userId: varchar('user_id', { length: 36 }).notNull(),
+		provider: varchar('provider', { length: 32 }).notNull(),
+		providerAccountId: varchar('provider_account_id', { length: 255 }).notNull(),
+		displayName: varchar('display_name', { length: 255 }),
+		email: varchar('email', { length: 255 }),
+		avatarUrl: varchar('avatar_url', { length: 512 }),
+		accessToken: varchar('access_token', { length: 1024 }),
+		refreshToken: varchar('refresh_token', { length: 1024 }),
+		expiresAt: timestamp('expires_at'),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(t) => ({
+		userIdx: index('la_user_idx').on(t.userId),
+		providerIdx: index('la_provider_idx').on(t.provider, t.providerAccountId)
+	})
+);
+
+export const socialOAuthStates = mysqlTable(
+	'social_oauth_states',
+	{
+		id: varchar('id', { length: 36 }).primaryKey(),
+		provider: varchar('provider', { length: 32 }).notNull(),
+		codeVerifier: varchar('code_verifier', { length: 255 }).notNull(),
+		state: varchar('state', { length: 128 }).notNull(),
+		oauthParams: varchar('oauth_params', { length: 2048 }),
+		action: varchar('action', { length: 32 }).notNull(),
+		userId: varchar('user_id', { length: 36 }),
+		expiresAt: timestamp('expires_at').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(t) => ({
+		expiresIdx: index('sos_expires_idx').on(t.expiresAt)
+	})
+);
+
+export const pendingSocialRegistrations = mysqlTable(
+	'pending_social_registrations',
+	{
+		id: varchar('id', { length: 36 }).primaryKey(),
+		email: varchar('email', { length: 255 }).notNull(),
+		username: varchar('username', { length: 255 }).notNull(),
+		avatarUrl: varchar('avatar_url', { length: 512 }),
+		provider: varchar('provider', { length: 32 }).notNull(),
+		providerAccountId: varchar('provider_account_id', { length: 255 }).notNull(),
+		displayName: varchar('display_name', { length: 255 }),
+		oauthParams: varchar('oauth_params', { length: 2048 }),
+		expiresAt: timestamp('expires_at').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(t) => ({
+		emailIdx: index('psr_email_idx').on(t.email)
+	})
+);
+
 export type AuthCode = typeof authCodes.$inferSelect;
 export type AccessToken = typeof accessTokens.$inferSelect;
 export type Scope = typeof scopes.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type PendingRegistration = typeof pendingRegistrations.$inferSelect;
+export type LinkedAccount = typeof linkedAccounts.$inferSelect;

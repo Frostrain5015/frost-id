@@ -42,6 +42,7 @@
 	<div class="foot-base">
 		<span class="frost-tech"><span class="frost-spin" aria-hidden="true">❄</span> {$t('home.footer.made')}</span>
 		<span>© {new Date().getFullYear()} {$t('home.footer.rights')}</span>
+		<a href="https://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer" class="foot-icp">浙ICP备2026040257号-1</a>
 	</div>
 </footer>
 
@@ -64,5 +65,7 @@
 	.frost-tech { display: inline-flex; align-items: center; gap: 0.4rem; }
 	.frost-spin { display: inline-block; animation: frostRotate 6s ease-in-out infinite; }
 	@keyframes frostRotate { 0%,75% { transform: rotate(0deg); } 88% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
+	.foot-icp { color: var(--text-dim); text-decoration: none; opacity: 0.7; transition: opacity 0.15s; }
+	.foot-icp:hover { opacity: 1; }
 	@media (prefers-reduced-motion: reduce) { .frost-spin { animation: none; } }
 </style>

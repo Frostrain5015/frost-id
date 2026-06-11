@@ -14,7 +14,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 	return {
 		oauthParams: url.searchParams.get('oauth'),
-		resetSuccess: url.searchParams.get('reset') === '1'
+		resetSuccess: url.searchParams.get('reset') === '1',
+		socialError: url.searchParams.get('error')
 	};
 };
 

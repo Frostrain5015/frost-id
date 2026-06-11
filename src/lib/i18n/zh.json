@@ -32,7 +32,12 @@
     "forgot_password": "忘记密码？",
     "reset_success": "密码已更新，请使用新密码登录。",
     "err_credentials": "邮箱或密码错误",
-    "err_required": "请填写邮箱和密码"
+    "err_required": "请填写邮箱和密码",
+    "or_continue_with": "或使用以下方式登录",
+    "continue_github": "使用 Github 登录",
+    "continue_google": "使用 Google 登录",
+    "err_social_failed": "社交登录失败，请重试。",
+    "err_social_no_email": "该账户未关联邮箱，请先使用邮箱和密码注册。"
   },
   "forgot": {
     "page_title": "重置密码 — Frost ID",
@@ -88,7 +93,8 @@
     "verify_resent": "验证码已重新发送",
     "verify_back": "返回",
     "err_code_invalid": "验证码无效或已过期，请重试",
-    "err_expired": "注册会话已过期，请重新开始"
+    "err_expired": "注册会话已过期，请重新开始",
+    "social_hint": "使用社交账号注册将创建一个关联该提供商的 Frost ID。"
   },
   "consent": {
     "page_title": "授权 — Frost ID",
@@ -195,7 +201,20 @@
       "delete_confirm": "输入密码以确认",
       "delete_btn": "注销我的账户",
       "delete_deleting": "注销中…",
-      "delete_wrong_password": "密码错误"
+      "delete_wrong_password": "密码错误",
+
+      "linked_section": "关联账号",
+      "linked_desc": "将您的 Frost ID 关联到社交账号，方便快速登录。",
+      "link_connect": "关联",
+      "link_connected": "账号关联成功",
+      "link_unlink": "解除关联",
+      "link_unlink_confirm": "确定要解除关联吗？解除后将无法使用该方式登录。",
+      "link_removed": "已解除关联",
+      "link_err_missing": "未指定账户",
+      "link_err_not_found": "未找到关联账户",
+      "link_err_already_used": "该社交账号已关联到其他 Frost ID。",
+      "link_err_already_linked": "该提供商已关联到您的账户。",
+      "link_err_unauthorized": "您无权关联此账户。"
     }
   },
   "home": {
@@ -339,5 +358,13 @@
     "empty_desc": "添加 Frost ID 以开始使用",
     "err_fields": "所有字段均为必填项",
     "err_password": "密码至少需要 8 位字符"
+  },
+  "social_complete": {
+    "page_title": "完成注册 — Frost ID",
+    "expired": "此注册链接已过期，请重新开始。",
+    "back_to_login": "返回登录",
+    "setup_hint": "为您的 Frost ID 设置密码以完成注册。",
+    "submit": "创建账户",
+    "creating": "正在创建账户…"
   }
 }

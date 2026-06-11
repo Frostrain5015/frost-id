@@ -4,6 +4,7 @@
 	import { writable, derived } from 'svelte/store';
 	import { browser } from '$app/environment';
 	import { createTranslator, type Locale, type Translator } from '$lib/i18n/index.js';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import type { Readable, Writable } from 'svelte/store';
 	import type { LayoutData } from './$types';
 
@@ -30,3 +31,4 @@
 </script>
 
 {@render children()}
+<ConfirmDialog />

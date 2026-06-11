@@ -6,6 +6,7 @@
 	import type { Translator } from '$lib/i18n/index.js';
 	import LangToggle from '$lib/components/LangToggle.svelte';
 	import AppIcon from '$lib/components/AppIcon.svelte';
+	import SystemNotice from '$lib/components/SystemNotice.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -91,7 +92,7 @@
 			</form>
 
 			{#if form?.errorKey}
-				<div class="err" role="alert" aria-live="assertive">{$t(form.errorKey)}</div>
+				<SystemNotice variant="error" center>{$t(form.errorKey)}</SystemNotice>
 			{/if}
 
 			<!-- Scopes -->
@@ -214,8 +215,6 @@
 	.switch-account:hover:not(:disabled) { color: var(--accent-hi); opacity: 1; text-decoration-color: currentColor; }
 	.switch-account:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 	.switch-account:disabled { cursor: not-allowed; opacity: 0.4; }
-
-	.err { padding: 0.75rem 1rem; margin-bottom: 1.25rem; background: rgba(217,92,92,0.06); border: 1px solid rgba(217,92,92,0.2); border-radius: var(--radius-md); font-size: 0.8125rem; color: #e88383; text-align: center; animation: fadeUp 0.25s ease; }
 
 	.scopes-label { font-family: var(--font-body); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.625rem; }
 

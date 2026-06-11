@@ -5,6 +5,7 @@
 	import type { ActionData, PageData } from './$types';
 	import type { Translator } from '$lib/i18n/index.js';
 	import LangToggle from '$lib/components/LangToggle.svelte';
+	import SystemNotice from '$lib/components/SystemNotice.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -155,11 +156,11 @@
 				</p>
 
 				{#if errorMsg}
-					<div class="err" role="alert" aria-live="assertive">{$t(errorMsg)}</div>
+					<SystemNotice variant="error" center>{$t(errorMsg)}</SystemNotice>
 				{/if}
 
 				{#if resent}
-					<div class="notice" role="status" aria-live="polite">✦ {$t('register.verify_resent')}</div>
+					<SystemNotice variant="success" center>{$t('register.verify_resent')}</SystemNotice>
 				{/if}
 
 				<!-- Verify form -->
@@ -358,30 +359,6 @@
 		color: var(--accent-hi);
 		font-weight: 500;
 		letter-spacing: 0.01em;
-	}
-
-	/* ── Notices / Errors ─────────────────────────────────────────────────── */
-	.err {
-		padding: 0.75rem 1rem;
-		margin-bottom: 1.25rem;
-		background: rgba(217,92,92,0.06);
-		border: 1px solid rgba(217,92,92,0.2);
-		border-radius: var(--radius-md);
-		font-size: 0.8125rem;
-		color: #e88383;
-		animation: fadeUp 0.25s ease;
-		text-align: center;
-	}
-	.notice {
-		padding: 0.625rem 1rem;
-		margin-bottom: 1.25rem;
-		background: rgba(113,118,170,0.08);
-		border: 1px solid rgba(113,118,170,0.22);
-		border-radius: var(--radius-md);
-		font-size: 0.8125rem;
-		color: var(--accent-hi);
-		animation: fadeUp 0.25s ease;
-		text-align: center;
 	}
 
 	/* ── OTP Input ────────────────────────────────────────────────────────── */

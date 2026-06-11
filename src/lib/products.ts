@@ -26,7 +26,7 @@ export const products: Product[] = [
 		name: 'Investory',
 		brand: '#863bff',
 		brandAlt: '#47bfff',
-		url: 'https://116.62.179.231:8443/investory/',
+		url: 'https://investory.frostrain.tech',
 		kind: 'owned',
 		featureCount: 3
 	},
@@ -35,7 +35,7 @@ export const products: Product[] = [
 		name: 'Blades of Hex',
 		brand: '#ffd700',
 		brandAlt: '#ffe066',
-		url: 'http://116.62.179.231:3000',
+		url: 'https://boh.frostrain.tech',
 		kind: 'owned',
 		featureCount: 3
 	},
@@ -44,7 +44,7 @@ export const products: Product[] = [
 		name: 'PP Typeset',
 		brand: '#ea580c',
 		brandAlt: '#fb923c',
-		url: 'https://116.62.179.231:4081',
+		url: 'https://pptypeset.frostrain.tech',
 		kind: 'partner',
 		featureCount: 3
 	}
