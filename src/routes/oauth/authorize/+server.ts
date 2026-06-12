@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { oauthRequest, oauthResponse, oauthErrorResponse } from '$lib/server/oauth/adapter.js';
+import { oauthRequest, oauthErrorResponse } from '$lib/server/oauth/adapter.js';
 import { authorizationServer } from '$lib/server/oauth/server.js';
 import { storePending } from '$lib/server/oauth/pending.js';
 import type { RequestHandler } from './$types';
@@ -20,6 +20,7 @@ export const GET: RequestHandler = async ({ request, locals, url }) => {
 	}
 
 	authRequest.user = { id: locals.user.id };
-	const pendingId = storePending(authRequest, url.searchParams.toString());
+	const nonce = url.searchParams.get('nonce');
+	const pendingId = storePending(authRequest, url.searchParams.toString(), nonce);
 	throw redirect(302, `/consent?pid=${pendingId}`);
 };

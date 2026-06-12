@@ -9,7 +9,6 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler  = ({ request }) => userinfo(request);
 export const POST: RequestHandler = ({ request }) => userinfo(request);
 
-/** Verify an HS256 JWT using Node.js crypto (avoids jose version issues). */
 function verifyHS256(token: string, secret: string): Record<string, unknown> | null {
 	try {
 		const parts = token.split('.');
@@ -17,17 +16,14 @@ function verifyHS256(token: string, secret: string): Record<string, unknown> | n
 
 		const [header, payload, sigB64url] = parts;
 
-		// Verify signature
 		const expected = createHmac('sha256', secret)
 			.update(`${header}.${payload}`)
 			.digest();
 		const actual = Buffer.from(sigB64url, 'base64url');
 		if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return null;
 
-		// Decode payload
 		const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8')) as Record<string, unknown>;
 
-		// Check expiration
 		if (typeof data.exp === 'number' && data.exp < Date.now() / 1000) return null;
 
 		return data;
@@ -51,11 +47,20 @@ async function userinfo(request: Request): Promise<Response> {
 
 	const sub = (payload.sub as string) ?? (payload.jti as string);
 	if (!sub) {
-		return json({ error: 'invalid_token', error_description: 'No sub or jti', _payload: payload }, { status: 401 });
+		return json({ error: 'invalid_token', error_description: 'No sub or jti' }, { status: 401 });
 	}
 
+	const scopes = typeof payload.scope === 'string'
+		? payload.scope.split(' ')
+		: Array.isArray(payload.scopes) ? payload.scopes as string[] : [];
+
 	const [user] = await db
-		.select({ id: users.id, email: users.email, username: users.username })
+		.select({
+			id: users.id,
+			email: users.email,
+			username: users.username,
+			avatarUrl: users.avatarUrl
+		})
 		.from(users)
 		.where(eq(users.id, sub))
 		.limit(1);
@@ -64,10 +69,18 @@ async function userinfo(request: Request): Promise<Response> {
 		return json({ error: 'invalid_token', error_description: 'User not found' }, { status: 404 });
 	}
 
-	return json({
-		sub: user.id,
-		email: user.email,
-		preferred_username: user.username,
-		username: user.username
-	});
+	const claims: Record<string, unknown> = { sub: user.id };
+
+	if (scopes.includes('profile') || scopes.length === 0) {
+		claims.preferred_username = user.username;
+		claims.username = user.username;
+		if (user.avatarUrl) claims.picture = user.avatarUrl;
+	}
+
+	if (scopes.includes('email') || scopes.length === 0) {
+		claims.email = user.email;
+		claims.email_verified = true;
+	}
+
+	return json(claims);
 }

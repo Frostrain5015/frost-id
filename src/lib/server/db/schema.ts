@@ -45,6 +45,7 @@ export const authCodes = mysqlTable(
 		codeChallenge: varchar('code_challenge', { length: 255 }),
 		codeChallengeMethod: varchar('code_challenge_method', { length: 10 }),
 		scopes: json('scopes').$type<string[]>().notNull(),
+		nonce: varchar('nonce', { length: 255 }),
 		expiresAt: timestamp('expires_at').notNull(),
 		revoked: boolean('revoked').notNull().default(false),
 		createdAt: timestamp('created_at').notNull().defaultNow()
