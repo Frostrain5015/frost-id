@@ -37,6 +37,8 @@
     "continue_github": "使用 Github 登录",
     "continue_google": "使用 Google 登录",
     "err_social_failed": "社交登录失败，请重试。",
+    "err_social_network": "无法连接第三方服务，请检查网络后重试。如持续失败，请稍后再试。",
+    "err_social_expired": "登录会话已过期，请重新点击登录按钮。",
     "err_social_no_email": "该账户未关联邮箱，请先使用邮箱和密码注册。"
   },
   "forgot": {

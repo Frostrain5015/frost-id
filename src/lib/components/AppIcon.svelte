@@ -1,10 +1,9 @@
 <script lang="ts">
+	import { TrendingUp } from 'lucide-svelte';
+
 	// Shared application logo, used on both the consent screen and the admin
 	// console client list so each app's mark is identical in both places.
 	let { name, size = 48 }: { name: string; size?: number } = $props();
-
-	// Investory brand icon (TrendingUp SVG)
-	const investorySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`;
 
 	const lower       = $derived(name.toLowerCase());
 	const isInvestory = $derived(lower.includes('investory'));
@@ -22,7 +21,9 @@
 </script>
 
 {#if isInvestory}
-	<div class="app-icon investory" style="--s:{size}px" aria-hidden="true">{@html investorySvg}</div>
+	<div class="app-icon investory" style="--s:{size}px" aria-hidden="true">
+		<TrendingUp size={size * 0.5} color="#fff" strokeWidth={2} />
+	</div>
 {:else if isPPTypeset}
 	<div class="app-icon pp" style="--s:{size}px" aria-hidden="true"><em>PP</em></div>
 {:else if isBlades}
@@ -45,7 +46,6 @@
 		line-height: 1;
 	}
 	.investory { background: linear-gradient(135deg, #863bff, #47bfff); border-radius: calc(var(--s) * 0.25); }
-	.investory :global(svg) { width: calc(var(--s) * 0.5); height: calc(var(--s) * 0.5); display: block; color: #fff; }
 	.pp { background: #0A0A0D; border: 1px solid rgba(255, 255, 255, 0.08); }
 	.pp em { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; font-weight: 700; font-size: calc(var(--s) * 0.46); color: #ea580c; }
 	.blades { font-size: calc(var(--s) * 0.66); }

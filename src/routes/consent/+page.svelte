@@ -7,6 +7,7 @@
 	import LangToggle from '$lib/components/LangToggle.svelte';
 	import AppIcon from '$lib/components/AppIcon.svelte';
 	import SystemNotice from '$lib/components/SystemNotice.svelte';
+	import { User } from 'lucide-svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -72,9 +73,7 @@
 
 			<!-- Signed-in user -->
 			<p class="signed-as">
-				<svg class="user-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-				</svg>
+				<User size={14} class="user-icon" aria-hidden={true} />
 				<span>{$t('consent.signed_as')}&nbsp;<strong>{data.user.email}</strong></span>
 			</p>
 

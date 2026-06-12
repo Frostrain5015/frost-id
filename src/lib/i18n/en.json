@@ -37,6 +37,8 @@
     "continue_github": "Continue with Github",
     "continue_google": "Continue with Google",
     "err_social_failed": "Social login failed. Please try again.",
+    "err_social_network": "Could not reach the login provider. Please check your network and try again. If the problem persists, try again later.",
+    "err_social_expired": "The login session has expired. Please click the login button again.",
     "err_social_no_email": "This account has no email. Please sign up with email and password first."
   },
   "forgot": {

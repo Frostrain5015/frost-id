@@ -6,6 +6,7 @@
 	import type { Translator } from '$lib/i18n/index.js';
 	import LangToggle from '$lib/components/LangToggle.svelte';
 	import SystemNotice from '$lib/components/SystemNotice.svelte';
+	import { Mail } from 'lucide-svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -140,10 +141,7 @@
 				<!-- Envelope icon -->
 				<div class="mail-icon-wrap" aria-hidden="true">
 					<div class="mail-icon">
-						<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<rect x="4" y="10" width="40" height="28" rx="3" stroke="currentColor" stroke-width="2"/>
-							<path d="M4 14l20 14 20-14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-						</svg>
+						<Mail size={36} />
 						<div class="mail-pulse" aria-hidden="true"></div>
 					</div>
 				</div>

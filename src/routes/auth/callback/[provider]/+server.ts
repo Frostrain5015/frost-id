@@ -17,6 +17,17 @@ interface SocialProfile {
 	username: string | null;
 }
 
+const NETWORK_ERROR_SIGNALS = [
+	'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND',
+	'socket disconnected', 'SSL_ERROR_SYSCALL', 'fetch failed',
+	'network', 'TLS', 'UND_ERR_CONNECT_TIMEOUT'
+] as const;
+
+function isNetworkError(e: unknown): boolean {
+	const msg = e instanceof Error ? e.message : String(e);
+	return NETWORK_ERROR_SIGNALS.some((s) => msg.includes(s));
+}
+
 async function handleGitHubCallback(code: string): Promise<SocialProfile> {
 	const tokens = await github.validateAuthorizationCode(code);
 	const accessToken = tokens.accessToken();
@@ -90,7 +101,7 @@ export const GET: RequestHandler = async ({ params, url, cookies, request, local
 	const socialState = await consumeSocialState(state);
 	if (!socialState || socialState.provider !== provider) {
 		console.warn(`[Frost ID] ${provider} callback state mismatch or expired.`);
-		throw redirect(302, '/login?error=social_failed');
+		throw redirect(302, '/login?error=social_expired');
 	}
 
 	let profile: SocialProfile;
@@ -102,7 +113,8 @@ export const GET: RequestHandler = async ({ params, url, cookies, request, local
 		}
 	} catch (e) {
 		console.error(`[Frost ID] ${provider} callback error:`, e);
-		throw redirect(302, '/login?error=social_failed');
+		const errorKey = isNetworkError(e) ? 'social_network' : 'social_failed';
+		throw redirect(302, `/login?error=${errorKey}`);
 	}
 
 	if (!profile.email) {
