@@ -4,6 +4,7 @@
 	import type { Translator } from '$lib/i18n/index.js';
 	import { products } from '$lib/products.js';
 	import LangToggle from '$lib/components/LangToggle.svelte';
+	import { Mail, Phone, Github } from 'lucide-svelte';
 
 	let { user }: { user: { isAdmin: boolean } | null } = $props();
 	const t = getContext<Readable<Translator>>('t');
@@ -34,6 +35,22 @@
 			{/if}
 		</nav>
 
+		<nav class="foot-col" aria-label={$t('home.footer.contact')}>
+			<p class="foot-h">{$t('home.footer.contact')}</p>
+			<a href="mailto:phy55015@hotmail.com" class="contact-link">
+				<Mail size={13} aria-hidden="true" />
+				<span>phy55015@hotmail.com</span>
+			</a>
+			<a href="tel:15168655015" class="contact-link">
+				<Phone size={13} aria-hidden="true" />
+				<span>15168655015</span>
+			</a>
+			<a href="https://github.com/Frostrain5015" target="_blank" rel="noopener noreferrer" class="contact-link">
+				<Github size={13} aria-hidden="true" />
+				<span>GitHub</span>
+			</a>
+		</nav>
+
 		<div class="foot-end">
 			<LangToggle />
 		</div>
@@ -60,6 +77,9 @@
 	.foot-col a { font-size: 0.8125rem; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
 	.foot-col a:hover { color: var(--text); }
 	.foot-col a:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+
+	.contact-link { display: inline-flex; align-items: center; gap: 0.4rem; }
+	.contact-link :global(svg) { flex-shrink: 0; opacity: 0.6; }
 
 	.foot-base { max-width: 1100px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--text-dim); opacity: 0.7; text-transform: uppercase; }
 	.frost-tech { display: inline-flex; align-items: center; gap: 0.4rem; }
