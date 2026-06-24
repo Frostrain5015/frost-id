@@ -51,8 +51,8 @@ export const products: Product[] = [
 	{
 		key: 'boen',
 		name: 'Boen',
-		brand: '#d99a4e',
-		brandAlt: '#f0c275',
+		brand: '#14b48a',
+		brandAlt: '#2dd4a8',
 		url: 'https://boen.frostrain.tech',
 		kind: 'owned',
 		featureCount: 3
