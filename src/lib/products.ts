@@ -5,7 +5,7 @@
 
 export interface Product {
 	/** i18n + AppIcon key */
-	key: 'investory' | 'blades' | 'pp';
+	key: 'investory' | 'blades' | 'pp' | 'boen';
 	/** Display name (also drives AppIcon logo selection) */
 	name: string;
 	/** Primary brand colour — used ONLY as a restrained accent on the card */
@@ -46,6 +46,15 @@ export const products: Product[] = [
 		brandAlt: '#fb923c',
 		url: 'https://pptypeset.frostrain.tech',
 		kind: 'partner',
+		featureCount: 3
+	},
+	{
+		key: 'boen',
+		name: 'Boen',
+		brand: '#d99a4e',
+		brandAlt: '#f0c275',
+		url: 'https://boen.frostrain.tech',
+		kind: 'owned',
 		featureCount: 3
 	}
 ];

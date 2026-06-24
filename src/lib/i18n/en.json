@@ -270,6 +270,13 @@
         "f1": "Pandoc + XeLaTeX engine",
         "f2": "MCP integration · AI agent ready",
         "f3": "Full CJK typesetting optimization"
+      },
+      "boen": {
+        "tagline": "An education agent for the AI-native era",
+        "desc": "An AI learning agent for K-12 and university — multimodal Q&A, structured teaching, and smart quizzing.",
+        "f1": "Multimodal Q&A · solve from a photo",
+        "f2": "Preview / review / weakness-focused tutoring",
+        "f3": "AI quizzing, grading & knowledge profiling"
       }
     },
     "frostid": {
@@ -283,6 +290,7 @@
       "rights": "Frost Tech",
       "products": "Products",
       "identity": "Identity",
+      "contact": "Contact",
       "made": "Powered by Frost Tech"
     }
   },

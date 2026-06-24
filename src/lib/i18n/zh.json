@@ -270,6 +270,13 @@
         "f1": "Pandoc + XeLaTeX 引擎",
         "f2": "MCP 接入 · AI 可直连",
         "f3": "中文 CJK 排版优化"
+      },
+      "boen": {
+        "tagline": "AI 原生时代的教育智能体",
+        "desc": "面向中小学与大学的 AI 学习智能体，多模态问答、结构化教学与智能出题测评。",
+        "f1": "多模态问答 · 拍照解题",
+        "f2": "预习 / 复习 / 薄弱点专项教学",
+        "f3": "AI 出题批改与知识画像"
       }
     },
     "frostid": {
@@ -283,6 +290,7 @@
       "rights": "寒霜科技 Frost Tech",
       "products": "产品",
       "identity": "身份",
+      "contact": "联系我们",
       "made": "Powered by Frost Tech"
     }
   },

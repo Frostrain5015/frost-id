@@ -140,13 +140,14 @@
 	@media (max-width: 560px) { .orbit-rail::before { display: none; } .orbit-drop { display: none; } }
 
 	/* ── Ecosystem ──────────────────────────────────────── */
-	.ecosystem { max-width: 1100px; margin: 0 auto; padding: 5rem clamp(1rem,4vw,2.5rem); }
+	.ecosystem { max-width: 1280px; margin: 0 auto; padding: 5rem clamp(1rem,4vw,2.5rem); }
 	.section-head { text-align: center; margin-bottom: 2.5rem; }
 	.section-title { margin-top: 0.6rem; font-family: var(--font-display); font-weight: 200; font-size: clamp(1.8rem, 4vw, 2.75rem); color: var(--text); letter-spacing: -0.01em; }
-	.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; align-items: stretch; }
+	.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; align-items: stretch; }
 	.grid > .up { display: flex; }
 	.grid > .up > :global(.card) { width: 100%; }
-	@media (max-width: 900px) { .grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; } }
+	@media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); max-width: 760px; margin: 0 auto; } }
+	@media (max-width: 560px) { .grid { grid-template-columns: 1fr; max-width: 460px; } }
 
 	/* ── Frost ID band ──────────────────────────────────── */
 	.frostid { padding: 4rem clamp(1rem,4vw,2.5rem) 6rem; }

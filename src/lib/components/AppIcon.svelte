@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TrendingUp } from 'lucide-svelte';
+	import { TrendingUp, GraduationCap } from 'lucide-svelte';
 
 	// Shared application logo, used on both the consent screen and the admin
 	// console client list so each app's mark is identical in both places.
@@ -9,6 +9,7 @@
 	const isInvestory = $derived(lower.includes('investory'));
 	const isPPTypeset = $derived(lower.includes('pp') || lower.includes('typeset'));
 	const isBlades    = $derived(lower.includes('blades') || lower.includes('hex'));
+	const isBoen      = $derived(lower.includes('boen'));
 	const initial     = $derived(name[0]?.toUpperCase() ?? '?');
 
 	function hashColor(n: string): string {
@@ -29,6 +30,10 @@
 {:else if isBlades}
 	<!-- Mirrors the Blades of Hex project favicon: the crossed-swords emoji. -->
 	<div class="app-icon blades" style="--s:{size}px" aria-hidden="true">⚔️</div>
+{:else if isBoen}
+	<div class="app-icon boen" style="--s:{size}px" aria-hidden="true">
+		<GraduationCap size={size * 0.5} color="#fff" strokeWidth={2} />
+	</div>
 {:else}
 	<div
 		class="app-icon initial"
@@ -49,5 +54,6 @@
 	.pp { background: #0A0A0D; border: 1px solid rgba(255, 255, 255, 0.08); }
 	.pp em { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; font-weight: 700; font-size: calc(var(--s) * 0.46); color: #ea580c; }
 	.blades { font-size: calc(var(--s) * 0.66); }
+	.boen { background: linear-gradient(135deg, #d99a4e, #f0c275); border-radius: calc(var(--s) * 0.25); }
 	.initial { border: 1.5px solid; font-family: var(--font-display); font-weight: 500; font-size: calc(var(--s) * 0.5); backdrop-filter: blur(4px); }
 </style>
